@@ -42,17 +42,16 @@ export default function PromptInput({
           value={value}
           disabled={disabled}
           onChange={(e) => onChange(e.target.value.slice(0, maxLength))}
-          placeholder="What's your video about? e.g., The rise and fall of the Roman Empire, for a history-loving audience…"
+          placeholder="What's your video about? e.g., The rise and fall the Roman Empire, for a history-loving audience…"
           className={clsx(
-            "w-full min-h-[150px] px-5 py-4 rounded-2xl",
+            "w-full min-h-[140px] px-4 py-4 rounded-xl",
             "text-base leading-relaxed",
             "border transition-all duration-150",
             "focus:outline-none focus:ring-2",
-            "shadow-sm focus:shadow-md",
-            disabled && "opacity-60 cursor-not-allowed",
+            disabled && "opacity-50 cursor-not-allowed",
           )}
           style={{
-            background: "var(--bg-surface)",
+            background: "var(--bg-input)",
             color: "var(--text-primary)",
             borderColor: "var(--border)",
             "--tw-ring-color": "var(--border-focus)",

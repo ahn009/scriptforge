@@ -27,42 +27,31 @@ export default function Home() {
 
   async function handleGenerate() {
     if (!ready || isGenerating) return;
-
     setIsGenerating(true);
     setScript("");
     setError(null);
-
     setTimeout(() => {
       viewerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 80);
-
     try {
       const response = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: prompt.trim(), tone, length }),
       });
-
       if (!response.ok) {
         let message = "Generation failed.";
-        try {
-          const body = await response.json();
-          if (body?.error) message = body.error;
-        } catch { /* ignore */ }
+        try { const body = await response.json(); if (body?.error) message = body.error; } catch { /* ignore */ }
         throw new Error(message);
       }
-
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
       if (!reader) throw new Error("No response stream.");
-
       let streamedError: string | null = null;
-
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
         const chunk = decoder.decode(value, { stream: true });
-
         const errIdx = chunk.indexOf("[ERROR]");
         if (errIdx !== -1) {
           const before = chunk.slice(0, errIdx);
@@ -70,15 +59,11 @@ export default function Home() {
           streamedError = chunk.slice(errIdx + "[ERROR]".length).trim();
           continue;
         }
-
         setScript((prev) => prev + chunk);
       }
-
       if (streamedError) throw new Error(streamedError);
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : "Something went wrong. Please try again.";
-      setError(message);
+      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
     } finally {
       setIsGenerating(false);
     }
@@ -96,20 +81,15 @@ export default function Home() {
   const stagger = (delay: number) => ({
     initial: { opacity: 0, y: 10 },
     animate: { opacity: 1, y: 0 },
-    transition: {
-      duration: 0.45,
-      delay,
-      ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
-    },
+    transition: { duration: 0.45, delay, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] },
   });
 
   return (
-    <div className="min-h-screen w-full" style={{ background: "var(--bg-base)" }}>
-      {/* Centered single-column layout */}
-      <div className="mx-auto w-full max-w-2xl px-4 sm:px-6 pb-28">
+    <div className="page-bg">
+      <div className="mx-auto w-full max-w-xl px-4 sm:px-6 pb-28">
         <Header />
 
-        <div ref={formRef} className="space-y-6">
+        <div ref={formRef} className="space-y-5">
           <motion.div {...stagger(0.05)}>
             <PromptInput value={prompt} onChange={setPrompt} disabled={isGenerating} />
           </motion.div>
@@ -139,18 +119,14 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.3 }}
-              className="mt-6 flex items-start gap-3 rounded-xl px-4 py-4"
-              style={{ background: "var(--bg-muted)", border: "1px solid var(--border)" }}
+              className="mt-5 flex items-start gap-3 rounded-xl px-4 py-4"
+              style={{ background: "rgba(220,38,38,0.08)", border: "1px solid rgba(220,38,38,0.25)" }}
               role="alert"
             >
               <AlertCircle size={18} strokeWidth={1.75} className="mt-0.5 shrink-0" style={{ color: "#dc2626" }} />
               <div className="flex-1">
-                <div className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: "#dc2626" }}>
-                  Error
-                </div>
-                <div className="text-base leading-relaxed" style={{ color: "var(--text-primary)" }}>
-                  {error}
-                </div>
+                <div className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: "#dc2626" }}>Error</div>
+                <div className="text-base leading-relaxed" style={{ color: "var(--text-primary)" }}>{error}</div>
               </div>
             </motion.div>
           )}
@@ -158,13 +134,7 @@ export default function Home() {
 
         <div ref={viewerRef}>
           {hasOutput && (
-            <ScriptViewer
-              script={script}
-              isGenerating={isGenerating}
-              tone={tone}
-              length={length}
-              onReset={handleReset}
-            />
+            <ScriptViewer script={script} isGenerating={isGenerating} tone={tone} length={length} onReset={handleReset} />
           )}
         </div>
 
