@@ -29,7 +29,7 @@ export default function PromptInput({
     <div className="w-full">
       <label
         htmlFor="prompt"
-        className="block text-sm font-semibold mb-2"
+        className="block text-sm font-medium mb-2"
         style={{ color: "var(--text-primary)" }}
       >
         Your content idea
@@ -44,10 +44,11 @@ export default function PromptInput({
           onChange={(e) => onChange(e.target.value.slice(0, maxLength))}
           placeholder="What's your video about? e.g., The rise and fall of the Roman Empire, for a history-loving audience…"
           className={clsx(
-            "w-full min-h-[130px] px-4 py-3.5 rounded-xl",
-            "text-[15px] leading-relaxed font-body",
+            "w-full min-h-[130px] px-4 py-3.5 rounded-2xl",
+            "text-[15px] leading-relaxed",
             "border transition-all duration-150",
             "focus:outline-none focus:ring-2",
+            "shadow-sm focus:shadow-md",
             disabled && "opacity-60 cursor-not-allowed",
           )}
           style={{

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Providers } from "./providers";
 
 export const metadata: Metadata = {
   title: "ScriptForge AI — Video Script Generator",
@@ -25,9 +26,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full antialiased">
+    <html lang="en" className="h-full antialiased" suppressHydrationWarning>
       <body className="min-h-full">
-        <main className="relative z-10">{children}</main>
+        <Providers>
+          <main className="relative z-10">{children}</main>
+        </Providers>
       </body>
     </html>
   );

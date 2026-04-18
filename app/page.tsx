@@ -33,21 +33,14 @@ export default function Home() {
     setError(null);
 
     setTimeout(() => {
-      viewerRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
+      viewerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 80);
 
     try {
       const response = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          prompt: prompt.trim(),
-          tone,
-          length,
-        }),
+        body: JSON.stringify({ prompt: prompt.trim(), tone, length }),
       });
 
       if (!response.ok) {
@@ -55,9 +48,7 @@ export default function Home() {
         try {
           const body = await response.json();
           if (body?.error) message = body.error;
-        } catch {
-          /* ignore */
-        }
+        } catch { /* ignore */ }
         throw new Error(message);
       }
 
@@ -86,9 +77,7 @@ export default function Home() {
       if (streamedError) throw new Error(streamedError);
     } catch (err: unknown) {
       const message =
-        err instanceof Error
-          ? err.message
-          : "Something went wrong. Please try again.";
+        err instanceof Error ? err.message : "Something went wrong. Please try again.";
       setError(message);
     } finally {
       setIsGenerating(false);
@@ -100,51 +89,36 @@ export default function Home() {
     setError(null);
     setIsGenerating(false);
     setTimeout(() => {
-      formRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
+      formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 60);
   }
 
   const stagger = (delay: number) => ({
-    initial: { opacity: 0, y: 14 },
+    initial: { opacity: 0, y: 10 },
     animate: { opacity: 1, y: 0 },
     transition: {
-      duration: 0.55,
+      duration: 0.45,
       delay,
       ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
     },
   });
 
   return (
-    <div className="min-h-screen w-full">
+    <div className="min-h-screen w-full" style={{ background: "var(--bg-base)" }}>
       <div className="mx-auto w-full max-w-2xl px-5 sm:px-6 pb-24">
         <Header />
 
         <div ref={formRef} className="space-y-5">
           <motion.div {...stagger(0.05)}>
-            <PromptInput
-              value={prompt}
-              onChange={setPrompt}
-              disabled={isGenerating}
-            />
+            <PromptInput value={prompt} onChange={setPrompt} disabled={isGenerating} />
           </motion.div>
 
           <motion.div {...stagger(0.12)}>
-            <ToneSelector
-              value={tone}
-              onChange={setTone}
-              disabled={isGenerating}
-            />
+            <ToneSelector value={tone} onChange={setTone} disabled={isGenerating} />
           </motion.div>
 
           <motion.div {...stagger(0.2)}>
-            <LengthSelector
-              value={length}
-              onChange={setLength}
-              disabled={isGenerating}
-            />
+            <LengthSelector value={length} onChange={setLength} disabled={isGenerating} />
           </motion.div>
 
           <motion.div {...stagger(0.28)}>
@@ -165,17 +139,17 @@ export default function Home() {
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.3 }}
               className="mt-5 flex items-start gap-3 rounded-xl px-4 py-3"
-              style={{ background: "var(--accent-dramatic-light)", border: "1px solid rgba(192,57,43,0.2)" }}
+              style={{ background: "var(--bg-muted)", border: "1px solid var(--border)" }}
               role="alert"
             >
               <AlertCircle
                 size={16}
-                strokeWidth={2}
+                strokeWidth={1.75}
                 className="mt-0.5 shrink-0"
-                style={{ color: "var(--accent-dramatic)" }}
+                style={{ color: "#dc2626" }}
               />
               <div className="flex-1">
-                <div className="text-[10px] font-semibold uppercase tracking-wider mb-0.5" style={{ color: "var(--accent-dramatic)" }}>
+                <div className="text-[10px] font-medium uppercase tracking-widest mb-0.5" style={{ color: "#dc2626" }}>
                   Error
                 </div>
                 <div className="text-sm leading-relaxed" style={{ color: "var(--text-primary)" }}>
@@ -198,7 +172,10 @@ export default function Home() {
           )}
         </div>
 
-        <footer className="mt-14 pb-2 border-t pt-6" style={{ borderColor: "var(--border)" }}>
+        <footer
+          className="mt-14 pb-2 border-t pt-6"
+          style={{ borderColor: "var(--border)" }}
+        >
           <p className="text-center text-xs" style={{ color: "var(--text-muted)" }}>
             Built for Blue Foxes AI Content Lab · Powered by Gemini
           </p>

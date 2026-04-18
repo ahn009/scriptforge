@@ -119,9 +119,9 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
 
   return (
     <motion.section
-      initial={{ opacity: 0, y: 24 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       className="relative w-full mt-8"
     >
       <div
@@ -136,7 +136,7 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
           {toneInfo && (
             <span
               className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium"
-              style={{ background: toneInfo.colorDim, color: toneInfo.color }}
+              style={{ background: "var(--bg-muted)", color: "var(--text-tertiary)" }}
             >
               <span className="h-1.5 w-1.5 rounded-full" style={{ background: toneInfo.color }} />
               {toneInfo.label}
@@ -190,11 +190,11 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
                   <div
                     key={i}
                     className="flex items-start gap-3 rounded-xl px-4 py-3"
-                    style={{ background: "var(--accent-neutral-light)", border: "1px solid rgba(37,99,235,0.15)" }}
+                    style={{ background: "var(--bg-muted)", border: "1px solid var(--border)" }}
                   >
-                    <Film size={14} strokeWidth={2} className="mt-0.5 shrink-0" style={{ color: "var(--accent-neutral)" }} />
+                    <Film size={14} strokeWidth={1.75} className="mt-0.5 shrink-0" style={{ color: "var(--text-tertiary)" }} />
                     <div>
-                      <div className="text-[10px] font-semibold uppercase tracking-wider mb-1" style={{ color: "var(--accent-neutral)" }}>B-Roll</div>
+                      <div className="text-[10px] font-semibold uppercase tracking-wider mb-1" style={{ color: "var(--text-muted)" }}>B-Roll</div>
                       <p className="text-sm italic leading-relaxed" style={{ color: "var(--text-secondary)" }}>
                         {block.text || "Visual direction"}
                       </p>
@@ -206,7 +206,7 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
               if (block.kind === "hook") {
                 return (
                   <div key={i}>
-                    <div className="text-[10px] font-semibold uppercase tracking-wider mb-2.5" style={{ color: "var(--accent)" }}>
+                    <div className="text-[10px] font-medium uppercase tracking-widest mb-2.5" style={{ color: "var(--accent)" }}>
                       Hook
                     </div>
                     {splitParagraphs(block.text).map((p, pi, arr) => (
@@ -253,7 +253,7 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
               if (block.kind === "conclusion") {
                 return (
                   <div key={i}>
-                    <div className="text-[10px] font-semibold uppercase tracking-wider mb-2.5" style={{ color: "var(--text-muted)" }}>
+                    <div className="text-[10px] font-medium uppercase tracking-widest mb-2.5" style={{ color: "var(--text-muted)" }}>
                       Conclusion
                     </div>
                     <div className="space-y-3">
@@ -279,8 +279,8 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
                     style={{ background: "var(--accent-light)", border: "1px solid var(--accent-border)" }}
                   >
                     <div className="flex items-center gap-2 mb-2">
-                      <Megaphone size={13} strokeWidth={2.2} style={{ color: "var(--accent)" }} />
-                      <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: "var(--accent)" }}>
+                      <Megaphone size={13} strokeWidth={1.75} style={{ color: "var(--accent)" }} />
+                      <span className="text-[10px] font-medium uppercase tracking-widest" style={{ color: "var(--accent)" }}>
                         Call to Action
                       </span>
                     </div>
@@ -313,7 +313,7 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
         {/* Action bar */}
         {script && (
           <div
-            className="flex flex-wrap items-center gap-2.5 px-4 md:px-5 py-3.5 border-t"
+            className="flex flex-wrap items-center gap-2 px-4 md:px-5 py-3.5 border-t"
             style={{ borderColor: "var(--border)", background: "var(--bg-base)" }}
           >
             <button
@@ -325,12 +325,12 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
             >
               {copied ? (
                 <>
-                  <Check size={14} strokeWidth={2.3} style={{ color: "var(--accent-uplifting)" }} />
-                  <span style={{ color: "var(--accent-uplifting)" }}>Copied!</span>
+                  <Check size={14} strokeWidth={2} style={{ color: "#16a34a" }} />
+                  <span style={{ color: "#16a34a" }}>Copied!</span>
                 </>
               ) : (
                 <>
-                  <ClipboardCopy size={14} strokeWidth={2.2} />
+                  <ClipboardCopy size={14} strokeWidth={1.75} />
                   Copy script
                 </>
               )}
@@ -343,7 +343,7 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
               className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-medium border cursor-pointer transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
               style={{ background: "var(--bg-surface)", borderColor: "var(--border)", color: "var(--text-tertiary)" }}
             >
-              <RefreshCw size={13} strokeWidth={2.2} />
+              <RefreshCw size={13} strokeWidth={1.75} />
               New script
             </button>
           </div>

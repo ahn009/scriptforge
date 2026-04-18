@@ -1,48 +1,64 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Serif+Display:ital@0;1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Inter:wght@300;400;500;600&display=swap');
 
 @import "tailwindcss";
 
 :root {
-  --bg-base: #F9F7F4;
-  --bg-surface: #FFFFFF;
-  --bg-muted: #F3F0EC;
-  --bg-hover: #EFECE7;
+  --bg-base: #ffffff;
+  --bg-surface: #f9f9f9;
+  --bg-muted: #f3f4f6;
+  --bg-hover: #e5e7eb;
 
-  --text-primary: #1A1A1A;
-  --text-secondary: #4A4A4A;
-  --text-tertiary: #6B6B6B;
-  --text-muted: #9B9B9B;
+  --text-primary: #1a1a1a;
+  --text-secondary: #4b5563;
+  --text-tertiary: #6b7280;
+  --text-muted: #9ca3af;
 
-  --accent: #C96A2A;
-  --accent-light: #FDF3EA;
-  --accent-border: rgba(201, 106, 42, 0.25);
+  --accent: #d97706;
+  --accent-light: #fffbeb;
+  --accent-border: rgba(217, 119, 6, 0.25);
 
-  --accent-dramatic: #C0392B;
-  --accent-dramatic-light: #FDF0EF;
-  --accent-neutral: #2563EB;
-  --accent-neutral-light: #EFF6FF;
-  --accent-uplifting: #16A34A;
-  --accent-uplifting-light: #F0FDF4;
-
-  --border: #E5E1D8;
-  --border-strong: #D0CAC0;
-  --border-focus: rgba(201, 106, 42, 0.5);
+  --border: #e5e7eb;
+  --border-strong: #d1d5db;
+  --border-focus: rgba(217, 119, 6, 0.4);
 
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-xl: 20px;
 
-  --font-display: 'DM Serif Display', Georgia, serif;
-  --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
   --shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
 }
 
+.dark {
+  --bg-base: #0d0d0d;
+  --bg-surface: #1c1c1e;
+  --bg-muted: #27272a;
+  --bg-hover: #3f3f46;
+
+  --text-primary: #fafafa;
+  --text-secondary: #d4d4d8;
+  --text-tertiary: #a1a1aa;
+  --text-muted: #71717a;
+
+  --accent: #f59e0b;
+  --accent-light: rgba(245, 158, 11, 0.08);
+  --accent-border: rgba(245, 158, 11, 0.25);
+
+  --border: #3f3f46;
+  --border-strong: #52525b;
+  --border-focus: rgba(245, 158, 11, 0.4);
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+}
+
 @theme inline {
-  --font-display: 'DM Serif Display', Georgia, serif;
-  --font-body: 'DM Sans', -apple-system, sans-serif;
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body: 'Inter', -apple-system, sans-serif;
 }
 
 * {
@@ -52,6 +68,7 @@
 }
 
 html {
+  color-scheme: light dark;
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -63,6 +80,7 @@ body {
   color: var(--text-primary);
   min-height: 100vh;
   overflow-x: hidden;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 ::-webkit-scrollbar {
@@ -97,14 +115,12 @@ body {
   font-family: var(--font-body);
 }
 
-/* Card base */
 .card {
   background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
 }
 
-/* Shimmer */
 @keyframes shimmer {
   0% { background-position: -400px 0; }
   100% { background-position: 400px 0; }
@@ -115,23 +131,35 @@ body {
   animation: shimmer 1.5s infinite;
 }
 
-/* Typing cursor */
 @keyframes blink {
   0%, 50% { opacity: 1; }
   51%, 100% { opacity: 0; }
 }
 .typing-cursor::after {
-  content: '|';
-  color: var(--accent);
+  content: '';
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: var(--accent);
   animation: blink 1s step-end infinite;
-  margin-left: 1px;
-  font-weight: 300;
+  margin-left: 2px;
+  vertical-align: text-bottom;
 }
 
-/* Fade in */
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+.header-blur {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.85);
+  border-bottom: 1px solid var(--border);
+}
+
+.dark .header-blur {
+  background: rgba(13, 13, 13, 0.85);
 }
 
 textarea {

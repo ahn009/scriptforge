@@ -47,8 +47,12 @@ next-env.d.ts
 # claude / agent tooling
 .agents/
 .claude-flow/
+.claude
 
 #MD files
-cLAUDE.md
-agents.md
+/CLAUDE.md
+/AGENTS.md
 
+
+AGENTS.md
+CLAUDE.md

@@ -18,22 +18,25 @@ export default function GenerateButton({ onClick, isGenerating, disabled, ready 
         type="button"
         onClick={onClick}
         disabled={disabled}
-        whileHover={disabled ? undefined : { opacity: 0.92 }}
+        whileHover={disabled ? undefined : { opacity: 0.9 }}
         whileTap={disabled ? undefined : { scale: 0.995 }}
         transition={{ duration: 0.1 }}
         className={clsx(
-          "relative w-full py-3 px-5 rounded-xl",
-          "font-body font-medium text-[15px]",
+          "relative w-full py-3.5 px-5 rounded-2xl",
+          "font-medium text-[15px]",
           "flex items-center justify-center gap-2",
           "transition-all duration-150 focus-visible:outline-none",
-          disabled
-            ? "cursor-not-allowed"
-            : "cursor-pointer",
+          disabled ? "cursor-not-allowed" : "cursor-pointer",
         )}
         style={
           disabled
             ? { background: "var(--bg-muted)", color: "var(--text-muted)", border: "1px solid var(--border)" }
-            : { background: "var(--accent)", color: "#FFFFFF", border: "none" }
+            : {
+                background: "var(--accent)",
+                color: "#ffffff",
+                border: "none",
+                boxShadow: ready ? "0 4px 14px rgba(217,119,6,0.25)" : "none",
+              }
         }
       >
         <AnimatePresence mode="wait" initial={false}>
@@ -46,7 +49,7 @@ export default function GenerateButton({ onClick, isGenerating, disabled, ready 
               className="flex items-center gap-2"
             >
               <Loader2 className="animate-spin" size={16} />
-              Generating script…
+              Generating…
             </motion.span>
           ) : (
             <motion.span

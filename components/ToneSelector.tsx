@@ -17,11 +17,11 @@ interface ToneSelectorProps {
 export default function ToneSelector({ value, onChange, disabled = false }: ToneSelectorProps) {
   return (
     <div className="w-full">
-      <label className="block text-sm font-semibold mb-2" style={{ color: "var(--text-primary)" }}>
+      <label className="block text-sm font-medium mb-2" style={{ color: "var(--text-primary)" }}>
         Tone
       </label>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
         {TONE_OPTIONS.map((tone) => {
           const Icon = ICONS[tone.icon];
           const selected = value === tone.id;
@@ -32,7 +32,7 @@ export default function ToneSelector({ value, onChange, disabled = false }: Tone
               disabled={disabled}
               onClick={() => onChange(tone.id)}
               whileTap={disabled ? undefined : { scale: 0.985 }}
-              transition={{ type: "spring", stiffness: 400, damping: 25 }}
+              transition={{ duration: 0.15 }}
               className={clsx(
                 "relative text-left px-4 py-3.5 rounded-xl border cursor-pointer",
                 "transition-all duration-150",
@@ -42,22 +42,22 @@ export default function ToneSelector({ value, onChange, disabled = false }: Tone
               style={{
                 background: selected ? "var(--accent-light)" : "var(--bg-surface)",
                 borderColor: selected ? "var(--accent-border)" : "var(--border)",
-                boxShadow: selected ? "0 0 0 2px var(--accent-border)" : "none",
+                boxShadow: selected ? "0 0 0 1.5px var(--accent-border)" : "none",
               }}
               aria-pressed={selected}
             >
               <div className="flex items-start gap-3">
                 <div
-                  className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+                  className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg"
                   style={{
                     background: selected ? tone.color : "var(--bg-muted)",
-                    color: selected ? "#fff" : "var(--text-secondary)",
+                    color: selected ? "#fff" : "var(--text-tertiary)",
                   }}
                 >
-                  {Icon && <Icon size={15} strokeWidth={2} />}
+                  {Icon && <Icon size={14} strokeWidth={1.75} />}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
+                  <div className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
                     {tone.label}
                   </div>
                   <div className="mt-0.5 text-xs leading-snug" style={{ color: "var(--text-tertiary)" }}>
