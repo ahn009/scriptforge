@@ -13,11 +13,11 @@ interface LengthSelectorProps {
 export default function LengthSelector({ value, onChange, disabled = false }: LengthSelectorProps) {
   return (
     <div className="w-full">
-      <label className="block text-sm font-medium mb-2" style={{ color: "var(--text-primary)" }}>
+      <label className="block text-base font-semibold mb-2.5" style={{ color: "var(--text-primary)" }}>
         Video length
       </label>
 
-      <div className="flex gap-2">
+      <div className="grid grid-cols-4 gap-3">
         {LENGTH_OPTIONS.map((option) => {
           const selected = value === option.id;
           return (
@@ -27,8 +27,8 @@ export default function LengthSelector({ value, onChange, disabled = false }: Le
               disabled={disabled}
               onClick={() => onChange(option.id)}
               className={clsx(
-                "flex flex-col items-center justify-center py-2.5 px-3 rounded-xl border cursor-pointer",
-                "transition-all duration-200 focus-visible:outline-none flex-1",
+                "flex flex-col items-center justify-center py-4 px-2 rounded-xl border cursor-pointer",
+                "transition-all duration-200 focus-visible:outline-none",
                 disabled && "opacity-60 cursor-not-allowed",
               )}
               style={{
@@ -38,12 +38,12 @@ export default function LengthSelector({ value, onChange, disabled = false }: Le
               aria-pressed={selected}
             >
               <span
-                className="text-sm font-semibold font-display leading-tight"
+                className="text-lg font-bold font-display leading-tight"
                 style={{ color: selected ? "var(--accent)" : "var(--text-primary)" }}
               >
                 {option.label}
               </span>
-              <span className="mt-0.5 text-[10px]" style={{ color: "var(--text-muted)" }}>
+              <span className="mt-1 text-xs" style={{ color: "var(--text-muted)" }}>
                 ~{option.wordTarget}w
               </span>
             </button>

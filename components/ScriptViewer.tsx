@@ -195,7 +195,7 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
                     <Film size={14} strokeWidth={1.75} className="mt-0.5 shrink-0" style={{ color: "var(--text-tertiary)" }} />
                     <div>
                       <div className="text-[10px] font-semibold uppercase tracking-wider mb-1" style={{ color: "var(--text-muted)" }}>B-Roll</div>
-                      <p className="text-sm italic leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+                      <p className="text-base italic leading-relaxed" style={{ color: "var(--text-secondary)" }}>
                         {block.text || "Visual direction"}
                       </p>
                     </div>
@@ -237,7 +237,7 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
                         <p
                           key={pi}
                           className={clsx(
-                            "text-[15px] leading-[1.8]",
+                            "text-base leading-[1.8]",
                             isLast && pi === arr.length - 1 && "typing-cursor",
                           )}
                           style={{ color: "var(--text-secondary)" }}
@@ -260,7 +260,7 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
                       {splitParagraphs(block.text).map((p, pi, arr) => (
                         <p
                           key={pi}
-                          className={clsx("text-[15px] leading-[1.8]", isLast && pi === arr.length - 1 && "typing-cursor")}
+                          className={clsx("text-base leading-[1.8]", isLast && pi === arr.length - 1 && "typing-cursor")}
                           style={{ color: "var(--text-secondary)" }}
                         >
                           {p}
@@ -287,7 +287,7 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
                     {splitParagraphs(block.text).map((p, pi, arr) => (
                       <p
                         key={pi}
-                        className={clsx("text-[15px] leading-[1.75]", pi < arr.length - 1 && "mb-2", isLast && pi === arr.length - 1 && "typing-cursor")}
+                        className={clsx("text-base leading-[1.75]", pi < arr.length - 1 && "mb-2", isLast && pi === arr.length - 1 && "typing-cursor")}
                         style={{ color: "var(--text-primary)" }}
                       >
                         {p}
@@ -300,7 +300,7 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
               return (
                 <p
                   key={i}
-                  className={clsx("text-[15px] leading-[1.8]", isLast && "typing-cursor")}
+                  className={clsx("text-base leading-[1.8]", isLast && "typing-cursor")}
                   style={{ color: "var(--text-secondary)" }}
                 >
                   {block.text}

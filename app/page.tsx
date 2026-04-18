@@ -105,10 +105,11 @@ export default function Home() {
 
   return (
     <div className="min-h-screen w-full" style={{ background: "var(--bg-base)" }}>
-      <div className="mx-auto w-full max-w-2xl px-5 sm:px-6 pb-24">
+      {/* Centered single-column layout */}
+      <div className="mx-auto w-full max-w-2xl px-4 sm:px-6 pb-28">
         <Header />
 
-        <div ref={formRef} className="space-y-5">
+        <div ref={formRef} className="space-y-6">
           <motion.div {...stagger(0.05)}>
             <PromptInput value={prompt} onChange={setPrompt} disabled={isGenerating} />
           </motion.div>
@@ -138,21 +139,16 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.3 }}
-              className="mt-5 flex items-start gap-3 rounded-xl px-4 py-3"
+              className="mt-6 flex items-start gap-3 rounded-xl px-4 py-4"
               style={{ background: "var(--bg-muted)", border: "1px solid var(--border)" }}
               role="alert"
             >
-              <AlertCircle
-                size={16}
-                strokeWidth={1.75}
-                className="mt-0.5 shrink-0"
-                style={{ color: "#dc2626" }}
-              />
+              <AlertCircle size={18} strokeWidth={1.75} className="mt-0.5 shrink-0" style={{ color: "#dc2626" }} />
               <div className="flex-1">
-                <div className="text-[10px] font-medium uppercase tracking-widest mb-0.5" style={{ color: "#dc2626" }}>
+                <div className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: "#dc2626" }}>
                   Error
                 </div>
-                <div className="text-sm leading-relaxed" style={{ color: "var(--text-primary)" }}>
+                <div className="text-base leading-relaxed" style={{ color: "var(--text-primary)" }}>
                   {error}
                 </div>
               </div>
@@ -172,11 +168,8 @@ export default function Home() {
           )}
         </div>
 
-        <footer
-          className="mt-14 pb-2 border-t pt-6"
-          style={{ borderColor: "var(--border)" }}
-        >
-          <p className="text-center text-xs" style={{ color: "var(--text-muted)" }}>
+        <footer className="mt-16 pb-2 border-t pt-8" style={{ borderColor: "var(--border)" }}>
+          <p className="text-center text-sm" style={{ color: "var(--text-muted)" }}>
             Built for Blue Foxes AI Content Lab · Powered by Gemini
           </p>
         </footer>

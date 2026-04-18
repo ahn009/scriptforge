@@ -17,11 +17,11 @@ interface ToneSelectorProps {
 export default function ToneSelector({ value, onChange, disabled = false }: ToneSelectorProps) {
   return (
     <div className="w-full">
-      <label className="block text-sm font-medium mb-2" style={{ color: "var(--text-primary)" }}>
+      <label className="block text-base font-semibold mb-2.5" style={{ color: "var(--text-primary)" }}>
         Tone
       </label>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {TONE_OPTIONS.map((tone) => {
           const Icon = ICONS[tone.icon];
           const selected = value === tone.id;
@@ -34,9 +34,8 @@ export default function ToneSelector({ value, onChange, disabled = false }: Tone
               whileTap={disabled ? undefined : { scale: 0.985 }}
               transition={{ duration: 0.15 }}
               className={clsx(
-                "relative text-left px-4 py-3.5 rounded-xl border cursor-pointer",
-                "transition-all duration-150",
-                "focus-visible:outline-none",
+                "relative text-left px-4 py-4 rounded-xl border cursor-pointer",
+                "transition-all duration-150 focus-visible:outline-none",
                 disabled && "opacity-60 cursor-not-allowed",
               )}
               style={{
@@ -48,19 +47,19 @@ export default function ToneSelector({ value, onChange, disabled = false }: Tone
             >
               <div className="flex items-start gap-3">
                 <div
-                  className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg"
+                  className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
                   style={{
                     background: selected ? tone.color : "var(--bg-muted)",
                     color: selected ? "#fff" : "var(--text-tertiary)",
                   }}
                 >
-                  {Icon && <Icon size={14} strokeWidth={1.75} />}
+                  {Icon && <Icon size={16} strokeWidth={1.75} />}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
+                  <div className="text-base font-semibold" style={{ color: "var(--text-primary)" }}>
                     {tone.label}
                   </div>
-                  <div className="mt-0.5 text-xs leading-snug" style={{ color: "var(--text-tertiary)" }}>
+                  <div className="mt-0.5 text-sm leading-snug" style={{ color: "var(--text-tertiary)" }}>
                     {tone.description}
                   </div>
                 </div>

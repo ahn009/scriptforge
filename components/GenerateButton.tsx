@@ -13,7 +13,7 @@ interface GenerateButtonProps {
 
 export default function GenerateButton({ onClick, isGenerating, disabled, ready }: GenerateButtonProps) {
   return (
-    <div className="space-y-2">
+    <div className="space-y-2.5">
       <motion.button
         type="button"
         onClick={onClick}
@@ -22,9 +22,9 @@ export default function GenerateButton({ onClick, isGenerating, disabled, ready 
         whileTap={disabled ? undefined : { scale: 0.995 }}
         transition={{ duration: 0.1 }}
         className={clsx(
-          "relative w-full py-3.5 px-5 rounded-2xl",
-          "font-medium text-[15px]",
-          "flex items-center justify-center gap-2",
+          "relative w-full py-4 px-6 rounded-2xl",
+          "font-semibold text-lg",
+          "flex items-center justify-center gap-2.5",
           "transition-all duration-150 focus-visible:outline-none",
           disabled ? "cursor-not-allowed" : "cursor-pointer",
         )}
@@ -35,7 +35,7 @@ export default function GenerateButton({ onClick, isGenerating, disabled, ready 
                 background: "var(--accent)",
                 color: "#ffffff",
                 border: "none",
-                boxShadow: ready ? "0 4px 14px rgba(217,119,6,0.25)" : "none",
+                boxShadow: ready ? "0 4px 18px rgba(217,119,6,0.3)" : "none",
               }
         }
       >
@@ -46,9 +46,9 @@ export default function GenerateButton({ onClick, isGenerating, disabled, ready 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2.5"
             >
-              <Loader2 className="animate-spin" size={16} />
+              <Loader2 className="animate-spin" size={18} />
               Generating…
             </motion.span>
           ) : (
@@ -57,16 +57,16 @@ export default function GenerateButton({ onClick, isGenerating, disabled, ready 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2.5"
             >
               Generate script
-              {ready && <ArrowRight size={15} />}
+              {ready && <ArrowRight size={18} />}
             </motion.span>
           )}
         </AnimatePresence>
       </motion.button>
 
-      <p className="text-center text-xs" style={{ color: "var(--text-muted)" }}>
+      <p className="text-center text-sm" style={{ color: "var(--text-muted)" }}>
         {ready && !isGenerating
           ? "~12 seconds · free to use"
           : "Fill in all fields above to continue"}

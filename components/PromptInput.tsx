@@ -29,7 +29,7 @@ export default function PromptInput({
     <div className="w-full">
       <label
         htmlFor="prompt"
-        className="block text-sm font-medium mb-2"
+        className="block text-base font-semibold mb-2.5"
         style={{ color: "var(--text-primary)" }}
       >
         Your content idea
@@ -44,8 +44,8 @@ export default function PromptInput({
           onChange={(e) => onChange(e.target.value.slice(0, maxLength))}
           placeholder="What's your video about? e.g., The rise and fall of the Roman Empire, for a history-loving audience…"
           className={clsx(
-            "w-full min-h-[130px] px-4 py-3.5 rounded-2xl",
-            "text-[15px] leading-relaxed",
+            "w-full min-h-[150px] px-5 py-4 rounded-2xl",
+            "text-base leading-relaxed",
             "border transition-all duration-150",
             "focus:outline-none focus:ring-2",
             "shadow-sm focus:shadow-md",
@@ -62,14 +62,14 @@ export default function PromptInput({
         />
 
         <span
-          className="absolute bottom-3 right-3.5 text-xs tabular-nums"
+          className="absolute bottom-3.5 right-4 text-sm tabular-nums"
           style={{ color: nearLimit ? "var(--accent)" : "var(--text-muted)" }}
         >
           {count}/{maxLength}
         </span>
       </div>
 
-      <p className="mt-1.5 text-xs" style={{ color: "var(--text-muted)" }}>
+      <p className="mt-2 text-sm" style={{ color: "var(--text-muted)" }}>
         Tip: mention your target audience for better results
       </p>
     </div>
