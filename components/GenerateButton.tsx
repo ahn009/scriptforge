@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Loader2, Wand2, ArrowRight } from "lucide-react";
+import { Loader2, ArrowRight } from "lucide-react";
 import clsx from "clsx";
 
 interface GenerateButtonProps {
@@ -11,38 +11,29 @@ interface GenerateButtonProps {
   ready: boolean;
 }
 
-export default function GenerateButton({
-  onClick,
-  isGenerating,
-  disabled,
-  ready,
-}: GenerateButtonProps) {
+export default function GenerateButton({ onClick, isGenerating, disabled, ready }: GenerateButtonProps) {
   return (
     <div className="space-y-2">
       <motion.button
         type="button"
         onClick={onClick}
         disabled={disabled}
-        whileHover={disabled ? undefined : { scale: 1.005 }}
+        whileHover={disabled ? undefined : { opacity: 0.92 }}
         whileTap={disabled ? undefined : { scale: 0.995 }}
-        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+        transition={{ duration: 0.1 }}
         className={clsx(
           "relative w-full py-3 px-5 rounded-xl",
-          "font-body font-medium text-sm",
-          "transition-all duration-200",
+          "font-body font-medium text-[15px]",
           "flex items-center justify-center gap-2",
-          "focus-visible:outline-none",
+          "transition-all duration-150 focus-visible:outline-none",
           disabled
-            ? "bg-[var(--bg-card-hover)] text-[var(--text-muted)] border border-[var(--border-subtle)]"
-            : "bg-[var(--accent-amber)] text-white border-none",
-          !disabled && ready && !isGenerating && "shadow-md",
+            ? "cursor-not-allowed"
+            : "cursor-pointer",
         )}
         style={
           disabled
-            ? undefined
-            : {
-                boxShadow: "0 2px 8px rgba(217, 119, 6, 0.25)",
-              }
+            ? { background: "var(--bg-muted)", color: "var(--text-muted)", border: "1px solid var(--border)" }
+            : { background: "var(--accent)", color: "#FFFFFF", border: "none" }
         }
       >
         <AnimatePresence mode="wait" initial={false}>
@@ -55,7 +46,7 @@ export default function GenerateButton({
               className="flex items-center gap-2"
             >
               <Loader2 className="animate-spin" size={16} />
-              Generating...
+              Generating script…
             </motion.span>
           ) : (
             <motion.span
@@ -65,33 +56,18 @@ export default function GenerateButton({
               exit={{ opacity: 0 }}
               className="flex items-center gap-2"
             >
-              <Wand2 size={16} />
-              Generate Script
-              <ArrowRight size={14} />
+              Generate script
+              {ready && <ArrowRight size={15} />}
             </motion.span>
           )}
         </AnimatePresence>
       </motion.button>
 
-      {!disabled && ready && !isGenerating && (
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-center text-[10px] text-[var(--text-muted)]"
-        >
-          ~12 seconds · No credit card required
-        </motion.p>
-      )}
-
-      {disabled && !ready && (
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-center text-[10px] text-[var(--text-muted)]"
-        >
-          Fill in all fields to generate
-        </motion.p>
-      )}
+      <p className="text-center text-xs" style={{ color: "var(--text-muted)" }}>
+        {ready && !isGenerating
+          ? "~12 seconds · free to use"
+          : "Fill in all fields above to continue"}
+      </p>
     </div>
   );
 }

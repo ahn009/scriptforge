@@ -6,11 +6,7 @@ import clsx from "clsx";
 import { TONE_OPTIONS } from "@/lib/constants";
 import type { Tone } from "@/lib/types";
 
-const ICONS: Record<string, LucideIcon> = {
-  Flame,
-  Scale,
-  Sparkles,
-};
+const ICONS: Record<string, LucideIcon> = { Flame, Scale, Sparkles };
 
 interface ToneSelectorProps {
   value: Tone | null;
@@ -18,19 +14,14 @@ interface ToneSelectorProps {
   disabled?: boolean;
 }
 
-export default function ToneSelector({
-  value,
-  onChange,
-  disabled = false,
-}: ToneSelectorProps) {
+export default function ToneSelector({ value, onChange, disabled = false }: ToneSelectorProps) {
   return (
     <div className="w-full">
-      <label className="block font-display text-sm tracking-[0.2em] uppercase text-[var(--text-secondary)] mb-3 flex items-center gap-2">
-        <Flame size={14} className="text-[var(--accent-dramatic)]" />
-        Choose Tone
+      <label className="block text-sm font-semibold mb-2" style={{ color: "var(--text-primary)" }}>
+        Tone
       </label>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
         {TONE_OPTIONS.map((tone) => {
           const Icon = ICONS[tone.icon];
           const selected = value === tone.id;
@@ -40,63 +31,36 @@ export default function ToneSelector({
               type="button"
               disabled={disabled}
               onClick={() => onChange(tone.id)}
-              whileHover={disabled ? undefined : { y: -1 }}
               whileTap={disabled ? undefined : { scale: 0.985 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              transition={{ type: "spring", stiffness: 400, damping: 25 }}
               className={clsx(
-                "relative text-left overflow-hidden",
-                "glass-card px-4 py-4 rounded-2xl cursor-pointer",
-                "transition-colors duration-200",
-                "border-l-[3px]",
+                "relative text-left px-4 py-3.5 rounded-xl border cursor-pointer",
+                "transition-all duration-150",
                 "focus-visible:outline-none",
-                !selected && "border-l-transparent hover:bg-[var(--bg-card-hover)]",
-                selected && "shadow-lg",
                 disabled && "opacity-60 cursor-not-allowed",
               )}
               style={{
-                background: selected ? tone.colorDim : undefined,
-                borderLeftColor: selected ? tone.color : undefined,
-                transform: selected ? "scale(1.015)" : undefined,
+                background: selected ? "var(--accent-light)" : "var(--bg-surface)",
+                borderColor: selected ? "var(--accent-border)" : "var(--border)",
+                boxShadow: selected ? "0 0 0 2px var(--accent-border)" : "none",
               }}
               aria-pressed={selected}
             >
-              {selected && (
-                <motion.div
-                  layoutId="tone-glow"
-                  aria-hidden
-                  className="pointer-events-none absolute inset-0"
-                  style={{
-                    boxShadow: `0 0 30px ${tone.colorDim} inset`,
-                  }}
-                  transition={{
-                    type: "spring",
-                    stiffness: 300,
-                    damping: 30,
-                  }}
-                />
-              )}
-
-              <div className="relative flex items-start gap-3">
+              <div className="flex items-start gap-3">
                 <div
-                  className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+                  className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
                   style={{
-                    background: selected ? tone.color : "rgba(255,255,255,0.04)",
-                    color: selected ? "#0A0A0B" : "var(--text-secondary)",
-                    transition: "all 200ms ease",
+                    background: selected ? tone.color : "var(--bg-muted)",
+                    color: selected ? "#fff" : "var(--text-secondary)",
                   }}
                 >
-                  {Icon && <Icon size={18} strokeWidth={2} />}
+                  {Icon && <Icon size={15} strokeWidth={2} />}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div
-                    className={clsx(
-                      "font-body font-semibold text-base leading-tight",
-                      selected ? "text-[var(--text-primary)]" : "text-[var(--text-primary)]",
-                    )}
-                  >
+                  <div className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
                     {tone.label}
                   </div>
-                  <div className="mt-1 text-xs text-[var(--text-secondary)] leading-snug">
+                  <div className="mt-0.5 text-xs leading-snug" style={{ color: "var(--text-tertiary)" }}>
                     {tone.description}
                   </div>
                 </div>

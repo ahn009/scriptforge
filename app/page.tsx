@@ -118,13 +118,11 @@ export default function Home() {
   });
 
   return (
-    <div className="relative min-h-screen w-full">
-      <div className="ambient-glow-left" aria-hidden />
-
-      <div className="relative z-10 mx-auto w-full max-w-3xl px-5 sm:px-6 md:px-8 pb-24">
+    <div className="min-h-screen w-full">
+      <div className="mx-auto w-full max-w-2xl px-5 sm:px-6 pb-24">
         <Header />
 
-        <div ref={formRef} className="space-y-7 md:space-y-8">
+        <div ref={formRef} className="space-y-5">
           <motion.div {...stagger(0.05)}>
             <PromptInput
               value={prompt}
@@ -166,19 +164,21 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.3 }}
-              className="mt-6 flex items-start gap-3 rounded-xl border border-[var(--accent-dramatic)]/30 bg-[var(--accent-dramatic-dim)] px-4 py-3"
+              className="mt-5 flex items-start gap-3 rounded-xl px-4 py-3"
+              style={{ background: "var(--accent-dramatic-light)", border: "1px solid rgba(192,57,43,0.2)" }}
               role="alert"
             >
               <AlertCircle
-                size={18}
+                size={16}
                 strokeWidth={2}
-                className="mt-0.5 shrink-0 text-[var(--accent-dramatic)]"
+                className="mt-0.5 shrink-0"
+                style={{ color: "var(--accent-dramatic)" }}
               />
               <div className="flex-1">
-                <div className="text-[10px] font-body tracking-[0.2em] uppercase text-[var(--accent-dramatic)] mb-0.5">
+                <div className="text-[10px] font-semibold uppercase tracking-wider mb-0.5" style={{ color: "var(--accent-dramatic)" }}>
                   Error
                 </div>
-                <div className="text-sm text-[var(--text-primary)] font-body leading-relaxed">
+                <div className="text-sm leading-relaxed" style={{ color: "var(--text-primary)" }}>
                   {error}
                 </div>
               </div>
@@ -198,40 +198,11 @@ export default function Home() {
           )}
         </div>
 
-        <motion.footer
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="mt-16 md:mt-20"
-        >
-          <div className="border-t border-[var(--border-subtle)] pt-6">
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 text-[11px] text-[var(--text-muted)] font-body">
-              <div className="flex items-center gap-2">
-                <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.707a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                <span>Bank-grade encryption</span>
-              </div>
-              <div className="hidden sm:block h-3 w-px bg-[var(--border-subtle)]" />
-              <div className="flex items-center gap-2">
-                <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                </svg>
-                <span>No credit card required</span>
-              </div>
-              <div className="hidden sm:block h-3 w-px bg-[var(--border-subtle)]" />
-              <div className="flex items-center gap-2">
-                <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                <span>Free to start</span>
-              </div>
-            </div>
-            <div className="text-center mt-5 text-xs text-[var(--text-muted)] font-body">
-              Built for Blue Foxes AI Content Lab · Powered by Claude
-            </div>
-          </div>
-        </motion.footer>
+        <footer className="mt-14 pb-2 border-t pt-6" style={{ borderColor: "var(--border)" }}>
+          <p className="text-center text-xs" style={{ color: "var(--text-muted)" }}>
+            Built for Blue Foxes AI Content Lab · Powered by Gemini
+          </p>
+        </footer>
       </div>
     </div>
   );
