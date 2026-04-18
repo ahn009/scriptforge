@@ -85,8 +85,8 @@ export default function Home() {
   });
 
   return (
-    <div className="page-bg">
-      <div className="mx-auto w-full max-w-xl px-4 sm:px-6 pb-28">
+    <div className="page-bg flex flex-col items-center">
+      <div className="w-full max-w-xl px-4 sm:px-6 pb-28">
         <Header />
 
         <div ref={formRef} className="space-y-5">
