@@ -29,8 +29,8 @@ export default function PromptInput({
     <div className="w-full">
       <label
         htmlFor="prompt"
-        className="block text-base font-semibold mb-2.5"
-        style={{ color: "var(--text-primary)" }}
+        className="block text-sm font-medium mb-2"
+        style={{ color: "var(--text-secondary)" }}
       >
         Your content idea
       </label>
@@ -42,12 +42,12 @@ export default function PromptInput({
           value={value}
           disabled={disabled}
           onChange={(e) => onChange(e.target.value.slice(0, maxLength))}
-          placeholder="What's your video about? e.g., The rise and fall the Roman Empire, for a history-loving audience…"
+          placeholder="What's your video about? e.g., The rise and fall of the Roman Empire, for a history-loving audience…"
           className={clsx(
-            "w-full min-h-[140px] px-4 py-4 rounded-xl",
+            "w-full min-h-[140px] px-4 py-4 rounded-2xl",
             "text-base leading-relaxed",
-            "border transition-all duration-150",
-            "focus:outline-none focus:ring-2",
+            "border shadow-sm transition-all duration-150",
+            "focus:outline-none focus:ring-2 focus:shadow-md",
             disabled && "opacity-50 cursor-not-allowed",
           )}
           style={{
@@ -61,14 +61,14 @@ export default function PromptInput({
         />
 
         <span
-          className="absolute bottom-3.5 right-4 text-sm tabular-nums"
+          className="absolute bottom-3.5 right-4 text-xs tabular-nums pointer-events-none"
           style={{ color: nearLimit ? "var(--accent)" : "var(--text-muted)" }}
         >
           {count}/{maxLength}
         </span>
       </div>
 
-      <p className="mt-2 text-sm" style={{ color: "var(--text-muted)" }}>
+      <p className="mt-1.5 text-xs" style={{ color: "var(--text-muted)" }}>
         Tip: mention your target audience for better results
       </p>
     </div>

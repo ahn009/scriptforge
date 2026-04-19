@@ -131,14 +131,14 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
         {/* Metadata bar */}
         <div
           className="flex flex-wrap items-center gap-2 px-4 md:px-5 py-3 border-b"
-          style={{ borderColor: "var(--border)", background: "var(--bg-base)" }}
+          style={{ borderColor: "var(--border)", background: "var(--bg-surface)" }}
         >
           {toneInfo && (
             <span
               className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium"
               style={{ background: "var(--bg-muted)", color: "var(--text-tertiary)" }}
             >
-              <span className="h-1.5 w-1.5 rounded-full" style={{ background: toneInfo.color }} />
+              <span className="h-1.5 w-1.5 rounded-full" style={{ background: "var(--accent)" }} />
               {toneInfo.label}
             </span>
           )}
@@ -314,7 +314,7 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
         {script && (
           <div
             className="flex flex-wrap items-center gap-2 px-4 md:px-5 py-3.5 border-t"
-            style={{ borderColor: "var(--border)", background: "var(--bg-base)" }}
+            style={{ borderColor: "var(--border)", background: "var(--bg-surface)" }}
           >
             <button
               type="button"

@@ -1,43 +1,36 @@
 "use client";
 
-import { motion } from "framer-motion";
 import ThemeToggle from "./ThemeToggle";
 
 export default function Header() {
   return (
-    <>
-      {/* Top-right icon strip — minimal, no full-width bar */}
-      <div className="fixed top-0 right-0 z-50 flex items-center gap-1 p-4">
+    <header
+      className="fixed top-0 left-0 right-0 z-50 h-14 flex items-center justify-between px-5 sm:px-8 border-b backdrop-blur-md"
+      style={{
+        background: "color-mix(in srgb, var(--bg-base) 85%, transparent)",
+        borderColor: "var(--border)",
+      }}
+    >
+      <span
+        className="font-display text-xl font-medium tracking-tight select-none"
+        style={{ color: "var(--text-primary)" }}
+      >
+        ScriptForge
+      </span>
+
+      <div className="flex items-center gap-3">
+        <span
+          className="hidden sm:block text-xs font-medium px-2 py-0.5 rounded-full"
+          style={{
+            color: "var(--text-muted)",
+            background: "var(--bg-surface)",
+            border: "1px solid var(--border)",
+          }}
+        >
+          Blue Foxes AI
+        </span>
         <ThemeToggle />
       </div>
-
-      {/* Centered hero */}
-      <motion.header
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-        className="text-center pt-16 pb-10"
-      >
-        <h1
-          className="font-display text-5xl sm:text-6xl md:text-7xl font-normal tracking-tight leading-[1.08]"
-          style={{ color: "var(--text-primary)" }}
-        >
-          ScriptForge AI
-        </h1>
-
-        <p
-          className="mt-4 text-lg sm:text-xl leading-relaxed"
-          style={{ color: "var(--text-tertiary)" }}
-        >
-          Turn your ideas into compelling video scripts
-        </p>
-        <p
-          className="mt-1 text-lg sm:text-xl italic font-display"
-          style={{ color: "var(--text-tertiary)" }}
-        >
-          — in seconds.
-        </p>
-      </motion.header>
-    </>
+    </header>
   );
 }

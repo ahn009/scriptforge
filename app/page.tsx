@@ -81,13 +81,34 @@ export default function Home() {
   const stagger = (delay: number) => ({
     initial: { opacity: 0, y: 10 },
     animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.45, delay, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] },
+    transition: { duration: 0.3, delay, ease: "easeOut" as const },
   });
 
   return (
-    <div className="page-bg flex flex-col items-center">
-      <div className="w-full max-w-xl px-4 sm:px-6 pb-28">
-        <Header />
+    <div className="flex flex-col items-center" style={{ background: "var(--bg-base)" }}>
+      <Header />
+
+      <div className="w-full max-w-2xl px-4 sm:px-6 pb-28 pt-24">
+        {/* Hero */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+          className="text-center py-10"
+        >
+          <h1
+            className="font-display text-5xl sm:text-6xl font-medium tracking-tight leading-tight"
+            style={{ color: "var(--text-primary)" }}
+          >
+            ScriptForge AI
+          </h1>
+          <p
+            className="mt-3 text-lg leading-relaxed"
+            style={{ color: "var(--text-tertiary)" }}
+          >
+            Turn your ideas into compelling video scripts — in seconds.
+          </p>
+        </motion.div>
 
         <div ref={formRef} className="space-y-5">
           <motion.div {...stagger(0.05)}>
@@ -118,9 +139,9 @@ export default function Home() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.25 }}
               className="mt-5 flex items-start gap-3 rounded-xl px-4 py-4"
-              style={{ background: "rgba(220,38,38,0.08)", border: "1px solid rgba(220,38,38,0.25)" }}
+              style={{ background: "rgba(220,38,38,0.07)", border: "1px solid rgba(220,38,38,0.20)" }}
               role="alert"
             >
               <AlertCircle size={18} strokeWidth={1.75} className="mt-0.5 shrink-0" style={{ color: "#dc2626" }} />

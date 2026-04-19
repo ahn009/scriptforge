@@ -8,22 +8,31 @@
   --bg-surface: #f5f5f5;
   --bg-muted: #ebebeb;
   --bg-hover: #e0e0e0;
-  --bg-input: #f9f9f9;
+  --bg-input: #ffffff;
 
   --text-primary: #111111;
   --text-secondary: #444444;
   --text-tertiary: #777777;
   --text-muted: #aaaaaa;
 
-  --accent: #c96a2a;
-  --accent-light: rgba(201, 106, 42, 0.12);
-  --accent-border: rgba(201, 106, 42, 0.3);
+  --accent: #f59e0b;
+  --accent-light: rgba(245, 158, 11, 0.10);
+  --accent-border: rgba(245, 158, 11, 0.30);
 
   --border: #e2e2e2;
   --border-strong: #cccccc;
-  --border-focus: rgba(201, 106, 42, 0.45);
+  --border-focus: rgba(245, 158, 11, 0.50);
 
-  --glow: none;
+  --btn-primary-bg: #111111;
+  --btn-primary-text: #ffffff;
+  --btn-primary-hover: #333333;
+
+  --accent-dramatic: #ef4444;
+  --accent-dramatic-dim: rgba(239, 68, 68, 0.12);
+  --accent-neutral: #6366f1;
+  --accent-neutral-dim: rgba(99, 102, 241, 0.12);
+  --accent-uplifting: #10b981;
+  --accent-uplifting-dim: rgba(16, 185, 129, 0.12);
 
   --font-display: 'Playfair Display', Georgia, serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -31,26 +40,35 @@
 
 /* ─── Dark mode tokens ──────────────────────────────────── */
 .dark {
-  --bg-base: #0c0c0c;
-  --bg-surface: #181818;
+  --bg-base: #0a0a0a;
+  --bg-surface: #161616;
   --bg-muted: #222222;
   --bg-hover: #2a2a2a;
-  --bg-input: #141414;
+  --bg-input: #111111;
 
   --text-primary: #f0f0f0;
-  --text-secondary: #c0c0c0;
-  --text-tertiary: #888888;
-  --text-muted: #555555;
+  --text-secondary: #b0b0b0;
+  --text-tertiary: #777777;
+  --text-muted: #4a4a4a;
 
-  --accent: #e08c30;
-  --accent-light: rgba(224, 140, 48, 0.12);
-  --accent-border: rgba(224, 140, 48, 0.35);
+  --accent: #f59e0b;
+  --accent-light: rgba(245, 158, 11, 0.10);
+  --accent-border: rgba(245, 158, 11, 0.30);
 
-  --border: #2a2a2a;
-  --border-strong: #383838;
-  --border-focus: rgba(224, 140, 48, 0.5);
+  --border: #252525;
+  --border-strong: #333333;
+  --border-focus: rgba(245, 158, 11, 0.45);
 
-  --glow: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(180, 90, 20, 0.22) 0%, transparent 70%);
+  --btn-primary-bg: #f0f0f0;
+  --btn-primary-text: #111111;
+  --btn-primary-hover: #d4d4d4;
+
+  --accent-dramatic: #f87171;
+  --accent-dramatic-dim: rgba(248, 113, 113, 0.12);
+  --accent-neutral: #818cf8;
+  --accent-neutral-dim: rgba(129, 140, 248, 0.12);
+  --accent-uplifting: #34d399;
+  --accent-uplifting-dim: rgba(52, 211, 153, 0.12);
 }
 
 @theme inline {
@@ -62,6 +80,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.1s ease;
 }
 
 html {
@@ -78,22 +97,13 @@ body {
   min-height: 100vh;
   width: 100%;
   overflow-x: hidden;
-  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* Ensure the Next.js root div doesn't break centering */
 #__next,
 [data-nextjs-scroll-focus-boundary] {
   display: flex;
   flex-direction: column;
   width: 100%;
-}
-
-/* Warm radial glow on dark mode only */
-.page-bg {
-  min-height: 100vh;
-  background-color: var(--bg-base);
-  background-image: var(--glow);
 }
 
 ::-webkit-scrollbar { width: 5px; }

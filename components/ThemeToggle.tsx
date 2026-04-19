@@ -10,30 +10,30 @@ export default function ThemeToggle() {
 
   useEffect(() => setMounted(true), []);
 
-  if (!mounted) return <div className="w-9 h-9" />;
+  if (!mounted) return <div className="w-8 h-8" />;
 
   function cycle() {
-    if (theme === "dark") setTheme("light");
-    else if (theme === "light") setTheme("system");
-    else setTheme("dark");
+    if (theme === "light") setTheme("dark");
+    else if (theme === "dark") setTheme("system");
+    else setTheme("light");
   }
 
-  const Icon = theme === "dark" ? Moon : theme === "light" ? Sun : Monitor;
-  const label = theme === "dark" ? "Switch to light" : theme === "light" ? "Switch to system" : "Switch to dark";
+  const Icon = theme === "light" ? Sun : theme === "dark" ? Moon : Monitor;
+  const label = theme === "light" ? "Switch to dark" : theme === "dark" ? "Switch to system" : "Switch to light";
 
   return (
     <button
       type="button"
       onClick={cycle}
       aria-label={label}
-      className="flex items-center justify-center w-9 h-9 rounded-lg transition-colors duration-150"
+      className="flex items-center justify-center w-8 h-8 rounded-lg transition-colors duration-150 cursor-pointer"
       style={{
         color: "var(--text-tertiary)",
         background: "var(--bg-surface)",
         border: "1px solid var(--border)",
       }}
     >
-      <Icon size={16} strokeWidth={1.75} />
+      <Icon size={15} strokeWidth={1.75} />
     </button>
   );
 }

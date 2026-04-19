@@ -13,11 +13,11 @@ interface LengthSelectorProps {
 export default function LengthSelector({ value, onChange, disabled = false }: LengthSelectorProps) {
   return (
     <div className="w-full">
-      <label className="block text-base font-semibold mb-2.5" style={{ color: "var(--text-primary)" }}>
+      <label className="block text-sm font-medium mb-2" style={{ color: "var(--text-secondary)" }}>
         Video length
       </label>
 
-      <div className="grid grid-cols-4 gap-2.5">
+      <div className="flex flex-wrap gap-2">
         {LENGTH_OPTIONS.map((option) => {
           const selected = value === option.id;
           return (
@@ -27,25 +27,26 @@ export default function LengthSelector({ value, onChange, disabled = false }: Le
               disabled={disabled}
               onClick={() => onChange(option.id)}
               className={clsx(
-                "flex flex-col items-center justify-center py-3.5 px-2 rounded-xl border cursor-pointer",
-                "transition-all duration-150 focus-visible:outline-none",
+                "px-4 py-1.5 rounded-full text-sm font-medium cursor-pointer",
+                "transition-all duration-150 focus-visible:outline-none border",
                 disabled && "opacity-50 cursor-not-allowed",
               )}
-              style={{
-                background: selected ? "var(--accent-light)" : "var(--bg-surface)",
-                borderColor: selected ? "var(--accent)" : "var(--border)",
-              }}
+              style={
+                selected
+                  ? {
+                      background: "var(--btn-primary-bg)",
+                      color: "var(--btn-primary-text)",
+                      borderColor: "var(--btn-primary-bg)",
+                    }
+                  : {
+                      background: "transparent",
+                      color: "var(--text-tertiary)",
+                      borderColor: "var(--border)",
+                    }
+              }
               aria-pressed={selected}
             >
-              <span
-                className="text-base font-bold font-display leading-tight"
-                style={{ color: selected ? "var(--accent)" : "var(--text-primary)" }}
-              >
-                {option.label}
-              </span>
-              <span className="mt-1 text-xs" style={{ color: "var(--text-muted)" }}>
-                ~{option.wordTarget}w
-              </span>
+              {option.label}
             </button>
           );
         })}

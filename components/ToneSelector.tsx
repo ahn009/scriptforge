@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { Flame, Scale, Sparkles, type LucideIcon } from "lucide-react";
 import clsx from "clsx";
 import { TONE_OPTIONS } from "@/lib/constants";
@@ -17,46 +16,43 @@ interface ToneSelectorProps {
 export default function ToneSelector({ value, onChange, disabled = false }: ToneSelectorProps) {
   return (
     <div className="w-full">
-      <label className="block text-base font-semibold mb-2.5" style={{ color: "var(--text-primary)" }}>
+      <label className="block text-sm font-medium mb-2" style={{ color: "var(--text-secondary)" }}>
         Tone
       </label>
 
-      <div className="grid grid-cols-3 gap-2.5">
+      <div className="grid grid-cols-3 gap-2">
         {TONE_OPTIONS.map((tone) => {
           const Icon = ICONS[tone.icon];
           const selected = value === tone.id;
           return (
-            <motion.button
+            <button
               key={tone.id}
               type="button"
               disabled={disabled}
               onClick={() => onChange(tone.id)}
-              whileTap={disabled ? undefined : { scale: 0.97 }}
-              transition={{ duration: 0.12 }}
               className={clsx(
-                "relative text-left px-3.5 py-3.5 rounded-xl border cursor-pointer",
+                "text-left px-4 py-3 rounded-xl border cursor-pointer",
                 "transition-all duration-150 focus-visible:outline-none",
                 disabled && "opacity-50 cursor-not-allowed",
               )}
               style={{
-                background: selected ? "var(--accent-light)" : "var(--bg-surface)",
-                borderColor: selected ? "var(--accent)" : "var(--border)",
+                background: selected ? "var(--bg-base)" : "var(--bg-surface)",
+                borderColor: selected ? "var(--accent-border)" : "transparent",
+                boxShadow: selected ? "0 1px 4px rgba(0,0,0,0.06)" : "none",
               }}
               aria-pressed={selected}
             >
-              <div className="flex items-center gap-2 mb-1.5">
-                <div
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg"
-                  style={{
-                    background: selected ? tone.color : "var(--bg-muted)",
-                    color: selected ? "#fff" : "var(--text-tertiary)",
-                  }}
-                >
-                  {Icon && <Icon size={14} strokeWidth={1.75} />}
-                </div>
+              <div className="flex items-center gap-2 mb-1">
+                {Icon && (
+                  <Icon
+                    size={15}
+                    strokeWidth={1.5}
+                    style={{ color: selected ? "var(--accent)" : "var(--text-tertiary)" }}
+                  />
+                )}
                 <span
-                  className="text-sm font-semibold"
-                  style={{ color: selected ? "var(--accent)" : "var(--text-primary)" }}
+                  className="text-sm font-medium"
+                  style={{ color: selected ? "var(--text-primary)" : "var(--text-secondary)" }}
                 >
                   {tone.label}
                 </span>
@@ -64,7 +60,7 @@ export default function ToneSelector({ value, onChange, disabled = false }: Tone
               <p className="text-xs leading-snug" style={{ color: "var(--text-muted)" }}>
                 {tone.description}
               </p>
-            </motion.button>
+            </button>
           );
         })}
       </div>
