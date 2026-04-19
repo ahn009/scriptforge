@@ -11,16 +11,23 @@ export default function Header() {
         borderColor: "var(--border)",
       }}
     >
-      <span
-        className="font-display text-xl font-normal tracking-tight select-none"
-        style={{ color: "var(--text-primary)" }}
-      >
-        ScriptForge
-      </span>
+      <div className="flex items-center gap-2.5">
+        <span
+          className="w-2 h-2 rounded-full"
+          style={{ background: "var(--accent)", boxShadow: "0 0 6px var(--accent)" }}
+          aria-hidden
+        />
+        <span
+          className="font-display text-xl font-normal tracking-tight select-none"
+          style={{ color: "var(--text-primary)" }}
+        >
+          ScriptForge
+        </span>
+      </div>
 
       <div className="flex items-center gap-3">
         <span
-          className="hidden sm:block text-xs font-medium px-2 py-0.5 rounded-full"
+          className="hidden sm:block text-xs font-medium px-2.5 py-1 rounded-full"
           style={{
             color: "var(--text-muted)",
             background: "var(--bg-surface)",

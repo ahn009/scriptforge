@@ -85,10 +85,17 @@ export default function Home() {
   });
 
   return (
-    <div className="flex flex-col items-center" style={{ background: "var(--bg-base)" }}>
+    <div className="relative flex flex-col items-center min-h-screen" style={{ background: "var(--bg-base)" }}>
+      {/* Side accent glow orb */}
+      <div
+        className="pointer-events-none absolute top-1/3 -right-32 w-96 h-96 rounded-full opacity-30 dark:opacity-15"
+        style={{ background: "radial-gradient(ellipse, rgba(99,102,241,0.35), transparent 70%)", filter: "blur(80px)" }}
+        aria-hidden
+      />
+
       <Header />
 
-      <div className="w-full max-w-2xl px-4 sm:px-6 pb-28 pt-24">
+      <div className="relative z-10 w-full max-w-2xl px-4 sm:px-6 pb-28 pt-24">
         {/* Hero */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
@@ -96,9 +103,21 @@ export default function Home() {
           transition={{ duration: 0.4, ease: "easeOut" }}
           className="text-center py-10 mb-12"
         >
+          <span
+            className="inline-block px-3 py-1 rounded-full text-xs font-medium uppercase tracking-widest mb-5"
+            style={{ background: "var(--accent-light)", color: "var(--accent)", border: "1px solid var(--accent-border)" }}
+          >
+            AI Script Generator
+          </span>
+
           <h1
             className="font-display text-4xl sm:text-5xl font-medium tracking-tight leading-tight"
-            style={{ color: "var(--text-primary)" }}
+            style={{
+              background: "linear-gradient(160deg, var(--text-primary) 30%, var(--text-tertiary) 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}
           >
             ScriptForge AI
           </h1>

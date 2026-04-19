@@ -99,6 +99,25 @@ body {
   overflow-x: hidden;
 }
 
+/* Ambient top glow */
+body::before {
+  content: '';
+  position: fixed;
+  top: -30%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90vw;
+  max-width: 900px;
+  height: 70vh;
+  background: radial-gradient(ellipse, rgba(245, 158, 11, 0.07) 0%, transparent 65%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.dark body::before {
+  background: radial-gradient(ellipse, rgba(245, 158, 11, 0.05) 0%, transparent 65%);
+}
+
 #__next,
 [data-nextjs-scroll-focus-boundary] {
   display: flex;
@@ -151,4 +170,10 @@ body {
 textarea {
   resize: vertical;
   font-family: var(--font-body);
+}
+
+/* Premium input glow on focus */
+textarea:focus,
+input:focus {
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.12);
 }

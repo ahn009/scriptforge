@@ -36,11 +36,10 @@ export default function ToneSelector({ value, onChange, disabled = false }: Tone
                 disabled && "opacity-50 cursor-not-allowed",
               )}
               style={{
-                background: selected
-                  ? "color-mix(in srgb, var(--accent) 8%, var(--bg-surface))"
-                  : "var(--bg-surface)",
-                borderColor: selected ? "var(--accent-border)" : "var(--border)",
-                boxShadow: selected ? "0 1px 4px rgba(0,0,0,0.06)" : "none",
+                background: selected ? tone.colorDim : "var(--bg-surface)",
+                borderColor: selected ? tone.color : "var(--border)",
+                borderLeftWidth: selected ? "3px" : "1px",
+                boxShadow: selected ? `0 0 16px -4px ${tone.color}30` : "none",
               }}
               aria-pressed={selected}
             >
@@ -49,7 +48,7 @@ export default function ToneSelector({ value, onChange, disabled = false }: Tone
                   size={20}
                   strokeWidth={1.5}
                   className="mb-3"
-                  style={{ color: selected ? "var(--accent)" : "var(--text-tertiary)" }}
+                  style={{ color: selected ? tone.color : "var(--text-tertiary)" }}
                 />
               )}
               <span

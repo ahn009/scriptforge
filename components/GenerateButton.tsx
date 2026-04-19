@@ -36,9 +36,10 @@ export default function GenerateButton({ onClick, isGenerating, disabled, ready 
                 border: "1px solid var(--border)",
               }
             : {
-                background: "var(--btn-primary-bg)",
-                color: "var(--btn-primary-text)",
+                background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
+                color: "#111111",
                 border: "none",
+                boxShadow: "0 4px 24px rgba(245,158,11,0.30), 0 1px 4px rgba(0,0,0,0.12)",
               }
         }
       >
