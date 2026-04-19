@@ -13,7 +13,7 @@ interface LengthSelectorProps {
 export default function LengthSelector({ value, onChange, disabled = false }: LengthSelectorProps) {
   return (
     <div className="w-full">
-      <label className="block text-sm font-medium mb-2" style={{ color: "var(--text-secondary)" }}>
+      <label className="block text-sm font-medium mb-2 uppercase tracking-wide" style={{ color: "var(--text-secondary)" }}>
         Video length
       </label>
 
@@ -27,7 +27,7 @@ export default function LengthSelector({ value, onChange, disabled = false }: Le
               disabled={disabled}
               onClick={() => onChange(option.id)}
               className={clsx(
-                "px-4 py-1.5 rounded-full text-sm font-medium cursor-pointer",
+                "px-4 py-2 rounded-full text-sm font-medium cursor-pointer",
                 "transition-all duration-150 focus-visible:outline-none border",
                 disabled && "opacity-50 cursor-not-allowed",
               )}

@@ -46,16 +46,14 @@ next-env.d.ts
 
 # claude / agent tooling
 .agents/
+agents/
 .claude-flow/
 .claude
+.mcp.json
 
 #MD files
-/CLAUDE.md
-/AGENTS.md
-
-
-AGENTS.md
 CLAUDE.md
+AGENTS.md
 
 #Design files
 /design-images

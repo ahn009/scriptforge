@@ -29,7 +29,7 @@ export default function PromptInput({
     <div className="w-full">
       <label
         htmlFor="prompt"
-        className="block text-sm font-medium mb-2"
+        className="block text-sm font-medium mb-2 uppercase tracking-wide"
         style={{ color: "var(--text-secondary)" }}
       >
         Your content idea
@@ -68,7 +68,7 @@ export default function PromptInput({
         </span>
       </div>
 
-      <p className="mt-1.5 text-xs" style={{ color: "var(--text-muted)" }}>
+      <p className="mt-2 text-xs" style={{ color: "var(--text-muted)" }}>
         Tip: mention your target audience for better results
       </p>
     </div>

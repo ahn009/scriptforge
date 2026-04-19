@@ -5,14 +5,14 @@ import ThemeToggle from "./ThemeToggle";
 export default function Header() {
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-50 h-14 flex items-center justify-between px-5 sm:px-8 border-b backdrop-blur-md"
+      className="fixed top-0 left-0 right-0 z-50 h-16 flex items-center justify-between px-4 sm:px-6 border-b backdrop-blur-md shadow-sm dark:shadow-none"
       style={{
         background: "color-mix(in srgb, var(--bg-base) 85%, transparent)",
         borderColor: "var(--border)",
       }}
     >
       <span
-        className="font-display text-xl font-medium tracking-tight select-none"
+        className="font-display text-xl font-normal tracking-tight select-none"
         style={{ color: "var(--text-primary)" }}
       >
         ScriptForge

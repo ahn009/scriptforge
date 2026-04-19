@@ -122,7 +122,7 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-      className="relative w-full mt-8"
+      className="relative w-full mt-12"
     >
       <div
         className="rounded-2xl overflow-hidden"
@@ -130,7 +130,7 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
       >
         {/* Metadata bar */}
         <div
-          className="flex flex-wrap items-center gap-2 px-4 md:px-5 py-3 border-b"
+          className="flex flex-wrap items-center gap-2 px-5 sm:px-8 py-3.5 border-b"
           style={{ borderColor: "var(--border)", background: "var(--bg-surface)" }}
         >
           {toneInfo && (
@@ -161,7 +161,7 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
         </div>
 
         {/* Content */}
-        <div className="px-5 md:px-8 py-7 md:py-10">
+        <div className="p-6 sm:p-8">
           {blocks.length === 0 && isGenerating && (
             <div className="space-y-3">
               <div className="h-4 w-2/3 rounded-md shimmer" />
@@ -171,7 +171,7 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
             </div>
           )}
 
-          <article className="space-y-6">
+          <article className="space-y-4">
             {blocks.map((block, i) => {
               const isLast = i === lastBlockIndex && isGenerating;
 
@@ -313,7 +313,7 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
         {/* Action bar */}
         {script && (
           <div
-            className="flex flex-wrap items-center gap-2 px-4 md:px-5 py-3.5 border-t"
+            className="flex flex-wrap items-center gap-2 px-5 sm:px-8 py-3.5 border-t"
             style={{ borderColor: "var(--border)", background: "var(--bg-surface)" }}
           >
             <button

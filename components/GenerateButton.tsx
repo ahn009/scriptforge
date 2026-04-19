@@ -13,7 +13,7 @@ interface GenerateButtonProps {
 
 export default function GenerateButton({ onClick, isGenerating, disabled, ready }: GenerateButtonProps) {
   return (
-    <div className="space-y-2">
+    <div className="space-y-3 mt-8">
       <motion.button
         type="button"
         onClick={onClick}
@@ -26,7 +26,7 @@ export default function GenerateButton({ onClick, isGenerating, disabled, ready 
           "font-medium text-base",
           "flex items-center justify-center gap-2.5",
           "transition-all duration-150 focus-visible:outline-none",
-          disabled ? "cursor-not-allowed" : "cursor-pointer",
+          disabled ? "cursor-not-allowed opacity-80" : "cursor-pointer",
         )}
         style={
           disabled

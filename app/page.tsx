@@ -94,23 +94,23 @@ export default function Home() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
-          className="text-center py-10"
+          className="text-center py-10 mb-12"
         >
           <h1
-            className="font-display text-5xl sm:text-6xl font-medium tracking-tight leading-tight"
+            className="font-display text-4xl sm:text-5xl font-medium tracking-tight leading-tight"
             style={{ color: "var(--text-primary)" }}
           >
             ScriptForge AI
           </h1>
           <p
-            className="mt-3 text-lg leading-relaxed"
+            className="mt-4 text-lg leading-relaxed"
             style={{ color: "var(--text-tertiary)" }}
           >
             Turn your ideas into compelling video scripts — in seconds.
           </p>
         </motion.div>
 
-        <div ref={formRef} className="space-y-5">
+        <div ref={formRef} className="space-y-8">
           <motion.div {...stagger(0.05)}>
             <PromptInput value={prompt} onChange={setPrompt} disabled={isGenerating} />
           </motion.div>
@@ -159,7 +159,7 @@ export default function Home() {
           )}
         </div>
 
-        <footer className="mt-16 pb-2 border-t pt-8" style={{ borderColor: "var(--border)" }}>
+        <footer className="mt-20 pt-8 pb-2 border-t" style={{ borderColor: "var(--border)" }}>
           <p className="text-center text-sm" style={{ color: "var(--text-muted)" }}>
             Built for Blue Foxes AI Content Lab · Powered by Gemini
           </p>
