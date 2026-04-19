@@ -86,12 +86,17 @@ export default function Home() {
 
   return (
     <div className="relative flex flex-col items-center min-h-screen" style={{ background: "var(--bg-base)" }}>
-      {/* Side accent glow orb */}
-      <div
-        className="pointer-events-none absolute top-1/3 -right-32 w-96 h-96 rounded-full opacity-30 dark:opacity-15"
-        style={{ background: "radial-gradient(ellipse, rgba(99,102,241,0.35), transparent 70%)", filter: "blur(80px)" }}
-        aria-hidden
-      />
+      {/* Ambient glow orbs — purely decorative, behind all content */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+        <div
+          className="absolute -top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[500px] rounded-full"
+          style={{ background: "radial-gradient(ellipse, rgba(245,158,11,0.06) 0%, transparent 65%)", filter: "blur(60px)" }}
+        />
+        <div
+          className="absolute top-1/3 -right-32 w-96 h-96 rounded-full"
+          style={{ background: "radial-gradient(ellipse, rgba(99,102,241,0.12) 0%, transparent 70%)", filter: "blur(80px)" }}
+        />
+      </div>
 
       <Header />
 
@@ -112,12 +117,7 @@ export default function Home() {
 
           <h1
             className="font-display text-4xl sm:text-5xl font-medium tracking-tight leading-tight"
-            style={{
-              background: "linear-gradient(160deg, var(--text-primary) 30%, var(--text-tertiary) 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}
+            style={{ color: "var(--text-primary)" }}
           >
             ScriptForge AI
           </h1>
