@@ -11,7 +11,7 @@ interface HeaderProps {
 export default function Header({ onReset }: HeaderProps) {
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-50 h-16 flex items-center justify-between px-4 sm:px-6 border-b backdrop-blur-md"
+      className="h-16 flex-shrink-0 flex items-center justify-between px-4 sm:px-6 border-b backdrop-blur-md z-50"
       style={{
         background: "color-mix(in srgb, var(--bg-base) 88%, transparent)",
         borderColor: "var(--border)",

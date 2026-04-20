@@ -9,9 +9,10 @@ interface GenerateButtonProps {
   isGenerating: boolean;
   disabled: boolean;
   ready: boolean;
+  missingField?: string | null;
 }
 
-export default function GenerateButton({ onClick, isGenerating, disabled, ready }: GenerateButtonProps) {
+export default function GenerateButton({ onClick, isGenerating, disabled, ready, missingField }: GenerateButtonProps) {
   const active = !disabled;
 
   return (
@@ -69,7 +70,7 @@ export default function GenerateButton({ onClick, isGenerating, disabled, ready 
               className="flex items-center gap-2.5 relative z-10"
             >
               <Loader2 className="animate-spin" size={17} strokeWidth={2} />
-              Generating…
+              Generating 3 scripts…
             </motion.span>
           ) : (
             <motion.span
@@ -81,15 +82,49 @@ export default function GenerateButton({ onClick, isGenerating, disabled, ready 
               className="flex items-center gap-2.5"
             >
               <Sparkles size={16} strokeWidth={1.75} />
-              Generate script
+              Generate 3 scripts
             </motion.span>
           )}
         </AnimatePresence>
       </motion.button>
 
-      <p className="text-center text-xs" style={{ color: "var(--text-muted)" }}>
-        {ready && !isGenerating ? "~12 seconds · free to use" : "Fill in all fields above to continue"}
-      </p>
+      <AnimatePresence mode="wait">
+        {isGenerating ? (
+          <motion.p
+            key="generating"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="text-center text-xs"
+            style={{ color: "var(--text-muted)" }}
+          >
+            ~15 seconds · 3 distinct variations · free to use
+          </motion.p>
+        ) : missingField ? (
+          <motion.p
+            key={missingField}
+            initial={{ opacity: 0, y: 3 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18 }}
+            className="text-center text-xs font-medium"
+            style={{ color: "var(--accent)" }}
+          >
+            {missingField}
+          </motion.p>
+        ) : ready ? (
+          <motion.p
+            key="ready"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="text-center text-xs"
+            style={{ color: "var(--text-muted)" }}
+          >
+            ~15 seconds · 3 distinct variations · free to use
+          </motion.p>
+        ) : null}
+      </AnimatePresence>
     </div>
   );
 }
