@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Sparkles } from "lucide-react";
 import Header from "@/components/Header";
 import PromptInput from "@/components/PromptInput";
 import ToneSelector from "@/components/ToneSelector";
@@ -19,8 +19,7 @@ export default function Home() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const viewerRef = useRef<HTMLDivElement>(null);
-  const formRef = useRef<HTMLDivElement>(null);
+  const outputPanelRef = useRef<HTMLDivElement>(null);
 
   const ready = Boolean(prompt.trim() && tone && length);
   const hasOutput = Boolean(script) || isGenerating;
@@ -31,7 +30,7 @@ export default function Home() {
     setScript("");
     setError(null);
     setTimeout(() => {
-      viewerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      outputPanelRef.current?.scrollTo({ top: 0, behavior: "smooth" });
     }, 80);
     try {
       const response = await fetch("/api/generate", {
@@ -73,117 +72,177 @@ export default function Home() {
     setScript("");
     setError(null);
     setIsGenerating(false);
-    setTimeout(() => {
-      formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 60);
   }
 
-  const stagger = (delay: number) => ({
-    initial: { opacity: 0, y: 10 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.3, delay, ease: "easeOut" as const },
-  });
-
   return (
-    <div className="relative flex flex-col items-center min-h-screen" style={{ background: "var(--bg-base)" }}>
-      {/* Ambient glow orbs — purely decorative, behind all content */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+    <div
+      className="flex flex-col md:h-screen md:overflow-hidden"
+      style={{ background: "var(--bg-base)" }}
+    >
+      {/* Ambient glow */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden>
         <div
-          className="absolute -top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[500px] rounded-full"
-          style={{ background: "radial-gradient(ellipse, rgba(245,158,11,0.06) 0%, transparent 65%)", filter: "blur(60px)" }}
+          className="absolute top-0 left-1/4 w-[600px] h-[400px] rounded-full"
+          style={{
+            background: "radial-gradient(ellipse, rgba(245,158,11,0.05) 0%, transparent 70%)",
+            filter: "blur(80px)",
+          }}
         />
         <div
-          className="absolute top-1/3 -right-32 w-96 h-96 rounded-full"
-          style={{ background: "radial-gradient(ellipse, rgba(99,102,241,0.12) 0%, transparent 70%)", filter: "blur(80px)" }}
+          className="absolute bottom-0 right-0 w-96 h-96 rounded-full"
+          style={{
+            background: "radial-gradient(ellipse, rgba(99,102,241,0.07) 0%, transparent 70%)",
+            filter: "blur(80px)",
+          }}
         />
       </div>
 
-      <Header />
+      <Header onReset={hasOutput ? handleReset : undefined} />
 
-      <div className="relative z-10 w-full max-w-2xl px-4 sm:px-6 pb-28 pt-24">
-        {/* Hero */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
-          className="text-center py-10 mb-12"
+      {/* Split workspace */}
+      <div className="relative flex flex-col md:flex-row flex-1 pt-16 md:overflow-hidden">
+
+        {/* ── LEFT PANEL: Input ── */}
+        <div
+          className="w-full md:w-[42%] md:overflow-y-auto md:border-r flex-shrink-0"
+          style={{ borderColor: "var(--border)" }}
         >
-          <span
-            className="inline-block px-3 py-1 rounded-full text-xs font-medium uppercase tracking-widest mb-5"
-            style={{ background: "var(--accent-light)", color: "var(--accent)", border: "1px solid var(--accent-border)" }}
-          >
-            AI Script Generator
-          </span>
+          <div className="p-6 lg:p-8 pb-16">
 
-          <h1
-            className="font-display text-4xl sm:text-5xl font-medium tracking-tight leading-tight"
-            style={{ color: "var(--text-primary)" }}
-          >
-            ScriptForge AI
-          </h1>
-          <p
-            className="mt-4 text-lg leading-relaxed"
-            style={{ color: "var(--text-tertiary)" }}
-          >
-            Turn your ideas into compelling video scripts — in seconds.
-          </p>
-        </motion.div>
+            {/* Panel heading */}
+            <div className="mb-8">
+              <p
+                className="text-[10px] font-semibold uppercase tracking-[0.14em] mb-1"
+                style={{ color: "var(--text-muted)" }}
+              >
+                Workspace
+              </p>
+              <h2
+                className="font-display text-2xl font-medium leading-tight"
+                style={{ color: "var(--text-primary)" }}
+              >
+                Build your script
+              </h2>
+            </div>
 
-        <div ref={formRef} className="space-y-8">
-          <motion.div {...stagger(0.05)}>
-            <PromptInput value={prompt} onChange={setPrompt} disabled={isGenerating} />
-          </motion.div>
+            {/* Sections with dividers */}
+            <div className="pb-7">
+              <PromptInput value={prompt} onChange={setPrompt} disabled={isGenerating} />
+            </div>
 
-          <motion.div {...stagger(0.12)}>
-            <ToneSelector value={tone} onChange={setTone} disabled={isGenerating} />
-          </motion.div>
+            <div className="border-t pt-7 pb-7" style={{ borderColor: "var(--border)" }}>
+              <ToneSelector value={tone} onChange={setTone} disabled={isGenerating} />
+            </div>
 
-          <motion.div {...stagger(0.2)}>
-            <LengthSelector value={length} onChange={setLength} disabled={isGenerating} />
-          </motion.div>
+            <div className="border-t pt-7 pb-7" style={{ borderColor: "var(--border)" }}>
+              <LengthSelector value={length} onChange={setLength} disabled={isGenerating} />
+            </div>
 
-          <motion.div {...stagger(0.28)}>
-            <GenerateButton
-              onClick={handleGenerate}
-              isGenerating={isGenerating}
-              disabled={!ready || isGenerating}
-              ready={ready}
-            />
-          </motion.div>
+            <div className="border-t pt-7" style={{ borderColor: "var(--border)" }}>
+              <GenerateButton
+                onClick={handleGenerate}
+                isGenerating={isGenerating}
+                disabled={!ready || isGenerating}
+                ready={ready}
+              />
+            </div>
+
+            <AnimatePresence>
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.22 }}
+                  className="mt-5 flex items-start gap-3 rounded-xl px-4 py-4"
+                  style={{
+                    background: "rgba(220,38,38,0.07)",
+                    border: "1px solid rgba(220,38,38,0.20)",
+                  }}
+                  role="alert"
+                >
+                  <AlertCircle size={16} strokeWidth={1.75} className="mt-0.5 shrink-0" style={{ color: "#dc2626" }} />
+                  <div>
+                    <div className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: "#dc2626" }}>Error</div>
+                    <div className="text-sm leading-relaxed" style={{ color: "var(--text-primary)" }}>{error}</div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
 
-        <AnimatePresence>
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.25 }}
-              className="mt-5 flex items-start gap-3 rounded-xl px-4 py-4"
-              style={{ background: "rgba(220,38,38,0.07)", border: "1px solid rgba(220,38,38,0.20)" }}
-              role="alert"
-            >
-              <AlertCircle size={18} strokeWidth={1.75} className="mt-0.5 shrink-0" style={{ color: "#dc2626" }} />
-              <div className="flex-1">
-                <div className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: "#dc2626" }}>Error</div>
-                <div className="text-base leading-relaxed" style={{ color: "var(--text-primary)" }}>{error}</div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <div ref={viewerRef}>
-          {hasOutput && (
-            <ScriptViewer script={script} isGenerating={isGenerating} tone={tone} length={length} onReset={handleReset} />
-          )}
+        {/* ── RIGHT PANEL: Output ── */}
+        <div
+          ref={outputPanelRef}
+          className="flex-1 md:overflow-y-auto border-t md:border-t-0"
+          style={{
+            borderColor: "var(--border)",
+            background: "color-mix(in srgb, var(--bg-base) 60%, var(--bg-surface))",
+          }}
+        >
+          <div className="max-w-3xl mx-auto p-6 lg:p-10 pb-16">
+            {hasOutput ? (
+              <ScriptViewer
+                script={script}
+                isGenerating={isGenerating}
+                tone={tone}
+                length={length}
+                onReset={handleReset}
+              />
+            ) : (
+              <EmptyOutputState />
+            )}
+          </div>
         </div>
 
-        <footer className="mt-20 pt-8 pb-2 border-t" style={{ borderColor: "var(--border)" }}>
-          <p className="text-center text-sm" style={{ color: "var(--text-muted)" }}>
-            Built for Blue Foxes AI Content Lab · Powered by Gemini
-          </p>
-        </footer>
       </div>
     </div>
+  );
+}
+
+function EmptyOutputState() {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5, delay: 0.15 }}
+      className="flex flex-col items-center justify-center min-h-[320px] md:min-h-[calc(100vh-8rem)] text-center px-8"
+    >
+      <motion.div
+        initial={{ scale: 0.85, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.4, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+        className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6"
+        style={{
+          background: "var(--bg-surface)",
+          border: "1px solid var(--border)",
+        }}
+      >
+        <Sparkles size={22} strokeWidth={1.5} style={{ color: "var(--accent)" }} />
+      </motion.div>
+
+      <motion.h3
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, delay: 0.28 }}
+        className="font-display text-2xl font-medium mb-3 leading-tight"
+        style={{ color: "var(--text-secondary)" }}
+      >
+        Start with an idea.
+        <br />
+        <span style={{ color: "var(--text-tertiary)" }}>We&apos;ll turn it into a story.</span>
+      </motion.h3>
+
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3, delay: 0.38 }}
+        className="text-sm leading-relaxed max-w-xs"
+        style={{ color: "var(--text-muted)" }}
+      >
+        Fill in your idea, pick a tone and length, then hit Generate.
+      </motion.p>
+    </motion.div>
   );
 }

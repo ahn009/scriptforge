@@ -94,6 +94,49 @@ function splitParagraphs(text: string): string[] {
   return text.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
 }
 
+function LoadingSkeleton() {
+  return (
+    <div className="space-y-8">
+      {/* Hook placeholder */}
+      <div>
+        <div
+          className="text-[10px] font-semibold uppercase tracking-[0.14em] mb-3"
+          style={{ color: "var(--accent)", opacity: 0.6 }}
+        >
+          Hook
+        </div>
+        <div className="border-l-2 pl-4 space-y-2.5" style={{ borderColor: "rgba(245,158,11,0.3)" }}>
+          <div className="h-7 w-4/5 rounded-md shimmer" />
+          <div className="h-7 w-3/5 rounded-md shimmer" />
+        </div>
+      </div>
+      {/* Pause placeholder */}
+      <div className="flex items-center gap-2 py-1">
+        {[0, 1, 2].map((j) => (
+          <span key={j} className="h-1.5 w-1.5 rounded-full shimmer" />
+        ))}
+      </div>
+      {/* Section placeholder */}
+      <div className="pl-4 border-l-2 space-y-3" style={{ borderColor: "var(--border-strong)" }}>
+        <div className="h-6 w-2/5 rounded-md shimmer" />
+        <div className="space-y-2">
+          <div className="h-4 w-full rounded shimmer" />
+          <div className="h-4 w-11/12 rounded shimmer" />
+          <div className="h-4 w-4/5 rounded shimmer" />
+        </div>
+      </div>
+      {/* Second section placeholder */}
+      <div className="pl-4 border-l-2 space-y-3" style={{ borderColor: "var(--border-strong)" }}>
+        <div className="h-6 w-1/3 rounded-md shimmer" />
+        <div className="space-y-2">
+          <div className="h-4 w-full rounded shimmer" />
+          <div className="h-4 w-5/6 rounded shimmer" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ScriptViewer({ script, isGenerating, tone, length, onReset }: ScriptViewerProps) {
   const [copied, setCopied] = useState(false);
   const blocks = useMemo(() => parseScript(script), [script]);
@@ -119,10 +162,10 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
 
   return (
     <motion.section
-      initial={{ opacity: 0, y: 16 }}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-      className="relative w-full mt-12"
+      className="relative w-full"
     >
       <div
         className="rounded-2xl overflow-hidden"
@@ -130,8 +173,8 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
       >
         {/* Metadata bar */}
         <div
-          className="flex flex-wrap items-center gap-2 px-5 sm:px-8 py-3.5 border-b"
-          style={{ borderColor: "var(--border)", background: "var(--bg-surface)" }}
+          className="flex flex-wrap items-center gap-2 px-5 sm:px-7 py-3.5 border-b"
+          style={{ borderColor: "var(--border)" }}
         >
           {toneInfo && (
             <span
@@ -162,25 +205,20 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
 
         {/* Content */}
         <div className="p-6 sm:p-8">
-          {blocks.length === 0 && isGenerating && (
-            <div className="space-y-3">
-              <div className="h-4 w-2/3 rounded-md shimmer" />
-              <div className="h-4 w-5/6 rounded-md shimmer" />
-              <div className="h-4 w-3/4 rounded-md shimmer" />
-              <div className="h-4 w-4/5 rounded-md shimmer" />
-            </div>
-          )}
+          {blocks.length === 0 && isGenerating && <LoadingSkeleton />}
 
-          <article className="space-y-4">
+          <article className="space-y-6">
             {blocks.map((block, i) => {
               const isLast = i === lastBlockIndex && isGenerating;
 
               if (block.kind === "pause") {
                 return (
-                  <div key={i} className="flex items-center gap-2 py-1" aria-label="Dramatic pause">
-                    {[0, 1, 2].map((j) => (
-                      <span key={j} className="h-1 w-1 rounded-full" style={{ background: "var(--border-strong)" }} />
-                    ))}
+                  <div key={i} className="flex items-center gap-3 py-2" aria-label="Dramatic pause">
+                    <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
+                    <span className="text-[10px] uppercase tracking-[0.2em] font-medium" style={{ color: "var(--text-muted)" }}>
+                      pause
+                    </span>
+                    <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
                   </div>
                 );
               }
@@ -189,13 +227,15 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
                 return (
                   <div
                     key={i}
-                    className="flex items-start gap-3 rounded-xl px-4 py-3"
+                    className="flex items-start gap-3 rounded-xl px-4 py-3.5"
                     style={{ background: "var(--bg-muted)", border: "1px solid var(--border)" }}
                   >
-                    <Film size={14} strokeWidth={1.75} className="mt-0.5 shrink-0" style={{ color: "var(--text-tertiary)" }} />
+                    <Film size={13} strokeWidth={1.75} className="mt-1 shrink-0" style={{ color: "var(--text-muted)" }} />
                     <div>
-                      <div className="text-[10px] font-semibold uppercase tracking-wider mb-1" style={{ color: "var(--text-muted)" }}>B-Roll</div>
-                      <p className="text-base italic leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+                      <div className="text-[10px] font-semibold uppercase tracking-[0.12em] mb-1.5" style={{ color: "var(--text-muted)" }}>
+                        B-Roll
+                      </div>
+                      <p className="text-sm italic leading-relaxed" style={{ color: "var(--text-tertiary)" }}>
                         {block.text || "Visual direction"}
                       </p>
                     </div>
@@ -205,15 +245,18 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
 
               if (block.kind === "hook") {
                 return (
-                  <div key={i}>
-                    <div className="text-[10px] font-medium uppercase tracking-widest mb-2.5" style={{ color: "var(--accent)" }}>
+                  <div key={i} className="border-l-2 pl-5" style={{ borderColor: "var(--accent)" }}>
+                    <div
+                      className="text-[10px] font-semibold uppercase tracking-[0.14em] mb-3"
+                      style={{ color: "var(--accent)" }}
+                    >
                       Hook
                     </div>
                     {splitParagraphs(block.text).map((p, pi, arr) => (
                       <p
                         key={pi}
                         className={clsx(
-                          "font-display text-2xl md:text-3xl leading-[1.4]",
+                          "font-display text-2xl md:text-3xl font-medium leading-[1.35]",
                           pi < arr.length - 1 && "mb-3",
                           isLast && pi === arr.length - 1 && "typing-cursor",
                         )}
@@ -228,8 +271,11 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
 
               if (block.kind === "section") {
                 return (
-                  <div key={i} className="pl-4 border-l-2" style={{ borderColor: "var(--accent)" }}>
-                    <h3 className="font-display text-xl md:text-2xl leading-tight mb-3" style={{ color: "var(--text-primary)" }}>
+                  <div key={i} className="pl-5 border-l-2" style={{ borderColor: "var(--border-strong)" }}>
+                    <div className="text-[10px] font-semibold uppercase tracking-[0.14em] mb-2" style={{ color: "var(--text-muted)" }}>
+                      Section
+                    </div>
+                    <h3 className="font-display text-xl md:text-2xl font-medium leading-tight mb-3" style={{ color: "var(--text-primary)" }}>
                       {block.title}
                     </h3>
                     <div className="space-y-3">
@@ -237,7 +283,7 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
                         <p
                           key={pi}
                           className={clsx(
-                            "text-base leading-[1.8]",
+                            "text-base leading-[1.85]",
                             isLast && pi === arr.length - 1 && "typing-cursor",
                           )}
                           style={{ color: "var(--text-secondary)" }}
@@ -252,15 +298,15 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
 
               if (block.kind === "conclusion") {
                 return (
-                  <div key={i}>
-                    <div className="text-[10px] font-medium uppercase tracking-widest mb-2.5" style={{ color: "var(--text-muted)" }}>
+                  <div key={i} className="pl-5 border-l-2" style={{ borderColor: "var(--border-strong)" }}>
+                    <div className="text-[10px] font-semibold uppercase tracking-[0.14em] mb-2" style={{ color: "var(--text-muted)" }}>
                       Conclusion
                     </div>
                     <div className="space-y-3">
                       {splitParagraphs(block.text).map((p, pi, arr) => (
                         <p
                           key={pi}
-                          className={clsx("text-base leading-[1.8]", isLast && pi === arr.length - 1 && "typing-cursor")}
+                          className={clsx("text-base leading-[1.85]", isLast && pi === arr.length - 1 && "typing-cursor")}
                           style={{ color: "var(--text-secondary)" }}
                         >
                           {p}
@@ -275,19 +321,19 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
                 return (
                   <div
                     key={i}
-                    className="rounded-xl px-4 py-4"
+                    className="rounded-xl px-5 py-4"
                     style={{ background: "var(--accent-light)", border: "1px solid var(--accent-border)" }}
                   >
-                    <div className="flex items-center gap-2 mb-2">
+                    <div className="flex items-center gap-2 mb-2.5">
                       <Megaphone size={13} strokeWidth={1.75} style={{ color: "var(--accent)" }} />
-                      <span className="text-[10px] font-medium uppercase tracking-widest" style={{ color: "var(--accent)" }}>
+                      <span className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ color: "var(--accent)" }}>
                         Call to Action
                       </span>
                     </div>
                     {splitParagraphs(block.text).map((p, pi, arr) => (
                       <p
                         key={pi}
-                        className={clsx("text-base leading-[1.75]", pi < arr.length - 1 && "mb-2", isLast && pi === arr.length - 1 && "typing-cursor")}
+                        className={clsx("text-base leading-[1.8]", pi < arr.length - 1 && "mb-2", isLast && pi === arr.length - 1 && "typing-cursor")}
                         style={{ color: "var(--text-primary)" }}
                       >
                         {p}
@@ -300,7 +346,7 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
               return (
                 <p
                   key={i}
-                  className={clsx("text-base leading-[1.8]", isLast && "typing-cursor")}
+                  className={clsx("text-base leading-[1.85]", isLast && "typing-cursor")}
                   style={{ color: "var(--text-secondary)" }}
                 >
                   {block.text}
@@ -313,14 +359,14 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
         {/* Action bar */}
         {script && (
           <div
-            className="flex flex-wrap items-center gap-2 px-5 sm:px-8 py-3.5 border-t"
-            style={{ borderColor: "var(--border)", background: "var(--bg-surface)" }}
+            className="flex flex-wrap items-center gap-2 px-5 sm:px-7 py-3.5 border-t"
+            style={{ borderColor: "var(--border)" }}
           >
             <button
               type="button"
               onClick={handleCopy}
               disabled={isGenerating}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-medium border cursor-pointer transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-medium border cursor-pointer transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-80"
               style={{ background: "var(--bg-surface)", borderColor: "var(--border)", color: "var(--text-primary)" }}
             >
               {copied ? (
@@ -340,7 +386,7 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
               type="button"
               onClick={onReset}
               disabled={isGenerating}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-medium border cursor-pointer transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-medium border cursor-pointer transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-80"
               style={{ background: "var(--bg-surface)", borderColor: "var(--border)", color: "var(--text-tertiary)" }}
             >
               <RefreshCw size={13} strokeWidth={1.75} />

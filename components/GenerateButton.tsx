@@ -12,47 +12,74 @@ interface GenerateButtonProps {
 }
 
 export default function GenerateButton({ onClick, isGenerating, disabled, ready }: GenerateButtonProps) {
+  const active = !disabled;
+
   return (
-    <div className="space-y-3 mt-8">
+    <div className="space-y-3">
       <motion.button
         type="button"
         onClick={onClick}
         disabled={disabled}
-        whileHover={disabled ? undefined : { opacity: 0.88 }}
-        whileTap={disabled ? undefined : { scale: 0.98 }}
-        transition={{ duration: 0.1 }}
+        whileHover={active ? { scale: 1.01, filter: "brightness(1.1)" } : undefined}
+        whileTap={active ? { scale: 0.97 } : undefined}
+        transition={{ duration: 0.12 }}
         className={clsx(
-          "relative w-full py-4 px-6 rounded-2xl",
-          "font-medium text-base",
+          "relative w-full py-4 px-6 rounded-2xl overflow-hidden",
+          "font-semibold text-base tracking-wide",
           "flex items-center justify-center gap-2.5",
-          "transition-all duration-150 focus-visible:outline-none",
-          disabled ? "cursor-not-allowed opacity-80" : "cursor-pointer",
+          "focus-visible:outline-none",
+          disabled && !isGenerating ? "cursor-not-allowed" : "cursor-pointer",
         )}
         style={
-          disabled
+          active
             ? {
+                background: "linear-gradient(135deg, #f59e0b 0%, #d97706 60%, #b45309 100%)",
+                color: "#0a0a0a",
+                border: "none",
+                boxShadow: "0 0 0 1px rgba(245,158,11,0.3), 0 4px 28px rgba(245,158,11,0.35), 0 1px 4px rgba(0,0,0,0.2)",
+              }
+            : {
                 background: "var(--bg-surface)",
                 color: "var(--text-muted)",
                 border: "1px solid var(--border)",
-              }
-            : {
-                background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
-                color: "#111111",
-                border: "none",
-                boxShadow: "0 4px 24px rgba(245,158,11,0.30), 0 1px 4px rgba(0,0,0,0.12)",
+                boxShadow: "none",
               }
         }
       >
+        {/* Shimmer sweep during generation */}
+        {isGenerating && (
+          <motion.div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: "linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.18) 50%, transparent 60%)",
+            }}
+            animate={{ x: ["-100%", "200%"] }}
+            transition={{ duration: 1.4, repeat: Infinity, ease: "linear" }}
+          />
+        )}
+
         <AnimatePresence mode="wait" initial={false}>
           {isGenerating ? (
-            <motion.span key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="flex items-center gap-2">
-              <Loader2 className="animate-spin" size={17} />
+            <motion.span
+              key="loading"
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.15 }}
+              className="flex items-center gap-2.5 relative z-10"
+            >
+              <Loader2 className="animate-spin" size={17} strokeWidth={2} />
               Generating…
             </motion.span>
           ) : (
-            <motion.span key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="flex items-center gap-2">
+            <motion.span
+              key="idle"
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.15 }}
+              className="flex items-center gap-2.5"
+            >
               <Sparkles size={16} strokeWidth={1.75} />
               Generate script
             </motion.span>
