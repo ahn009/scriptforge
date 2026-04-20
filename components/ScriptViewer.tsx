@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { ClipboardCopy, Check, RefreshCw, Clock, Film, Megaphone } from "lucide-react";
+import { ClipboardCopy, Check, RefreshCw, Film, Megaphone } from "lucide-react";
 import clsx from "clsx";
 import { TONE_OPTIONS, LENGTH_OPTIONS } from "@/lib/constants";
 import type { Tone, VideoLength } from "@/lib/types";
@@ -94,55 +94,13 @@ function splitParagraphs(text: string): string[] {
   return text.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
 }
 
-function LoadingSkeleton() {
-  return (
-    <div className="space-y-8">
-      {/* Hook placeholder */}
-      <div>
-        <div
-          className="text-[10px] font-semibold uppercase tracking-[0.14em] mb-3"
-          style={{ color: "var(--accent)", opacity: 0.6 }}
-        >
-          Hook
-        </div>
-        <div className="border-l-2 pl-4 space-y-2.5" style={{ borderColor: "rgba(245,158,11,0.3)" }}>
-          <div className="h-7 w-4/5 rounded-md shimmer" />
-          <div className="h-7 w-3/5 rounded-md shimmer" />
-        </div>
-      </div>
-      {/* Pause placeholder */}
-      <div className="flex items-center gap-2 py-1">
-        {[0, 1, 2].map((j) => (
-          <span key={j} className="h-1.5 w-1.5 rounded-full shimmer" />
-        ))}
-      </div>
-      {/* Section placeholder */}
-      <div className="pl-4 border-l-2 space-y-3" style={{ borderColor: "var(--border-strong)" }}>
-        <div className="h-6 w-2/5 rounded-md shimmer" />
-        <div className="space-y-2">
-          <div className="h-4 w-full rounded shimmer" />
-          <div className="h-4 w-11/12 rounded shimmer" />
-          <div className="h-4 w-4/5 rounded shimmer" />
-        </div>
-      </div>
-      {/* Second section placeholder */}
-      <div className="pl-4 border-l-2 space-y-3" style={{ borderColor: "var(--border-strong)" }}>
-        <div className="h-6 w-1/3 rounded-md shimmer" />
-        <div className="space-y-2">
-          <div className="h-4 w-full rounded shimmer" />
-          <div className="h-4 w-5/6 rounded shimmer" />
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function ScriptViewer({ script, isGenerating, tone, length, onReset }: ScriptViewerProps) {
   const [copied, setCopied] = useState(false);
   const blocks = useMemo(() => parseScript(script), [script]);
   const wordCount = useMemo(() => countWords(script), [script]);
   const toneInfo = tone ? TONE_OPTIONS.find((t) => t.id === tone) : null;
   const lengthInfo = length ? LENGTH_OPTIONS.find((l) => l.id === length) : null;
+  const lastBlockIndex = blocks.length - 1;
 
   useEffect(() => {
     if (!copied) return;
@@ -158,227 +116,227 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
     } catch { /* ignore */ }
   }
 
-  const lastBlockIndex = blocks.length - 1;
-
   return (
     <motion.section
-      initial={{ opacity: 0, y: 12 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-      className="relative w-full"
+      className="w-full"
     >
-      <div
-        className="rounded-2xl overflow-hidden"
-        style={{ background: "var(--bg-surface)", border: "1px solid var(--border)" }}
+      {/* Focus Reader Article */}
+      <article
+        className="w-full flex flex-col gap-10 p-8 md:p-12"
+        style={{
+          background: "#0e0e0f",
+          boxShadow: "0px 20px 40px rgba(0,0,0,0.4)",
+        }}
       >
-        {/* Metadata bar */}
-        <div
-          className="flex flex-wrap items-center gap-2 px-5 sm:px-7 py-3.5 border-b"
-          style={{ borderColor: "var(--border)" }}
+        {/* Article header */}
+        <header
+          className="flex flex-col gap-3 text-center pb-8"
+          style={{ borderBottom: "1px solid rgba(83,68,52,0.15)" }}
         >
-          {toneInfo && (
-            <span
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium"
-              style={{ background: "var(--bg-muted)", color: "var(--text-tertiary)" }}
-            >
-              <span className="h-1.5 w-1.5 rounded-full" style={{ background: "var(--accent)" }} />
-              {toneInfo.label}
-            </span>
-          )}
-          {lengthInfo && (
-            <span
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium"
-              style={{ background: "var(--bg-muted)", color: "var(--text-tertiary)" }}
-            >
-              <Clock size={11} strokeWidth={2} />
-              {lengthInfo.label}
-            </span>
-          )}
-          <span className="ml-auto flex items-center gap-1.5 text-xs tabular-nums" style={{ color: "var(--text-muted)" }}>
-            <span
-              className={clsx("h-1.5 w-1.5 rounded-full", isGenerating && "animate-pulse")}
-              style={{ background: isGenerating ? "var(--accent)" : "var(--border-strong)" }}
-            />
-            {wordCount} {wordCount === 1 ? "word" : "words"}
+          <span
+            className="text-[0.6875rem] uppercase tracking-widest"
+            style={{ color: "#f59e0b" }}
+          >
+            Generated Draft · v1.0
           </span>
-        </div>
+          {(toneInfo || lengthInfo) && (
+            <p
+              className="italic text-sm"
+              style={{ color: "#d8c3ad", fontFamily: '"Inter", sans-serif' }}
+            >
+              {[lengthInfo && `Target: ${lengthInfo.label}`, toneInfo && `Tone: ${toneInfo.label}`]
+                .filter(Boolean)
+                .join(" · ")}
+            </p>
+          )}
+        </header>
 
-        {/* Content */}
-        <div className="p-6 sm:p-8">
-          {blocks.length === 0 && isGenerating && <LoadingSkeleton />}
+        {/* Script content blocks */}
+        <div className="flex flex-col gap-8 text-lg leading-[1.8]">
+          {blocks.map((block, i) => {
+            const isLast = i === lastBlockIndex && isGenerating;
 
-          <article className="space-y-6">
-            {blocks.map((block, i) => {
-              const isLast = i === lastBlockIndex && isGenerating;
+            if (block.kind === "pause") {
+              return (
+                <div key={i} className="w-full my-2" aria-label="Dramatic pause">
+                  <div style={{ height: "1px", background: "rgba(83,68,52,0.15)" }} />
+                </div>
+              );
+            }
 
-              if (block.kind === "pause") {
-                return (
-                  <div key={i} className="flex items-center gap-3 py-2" aria-label="Dramatic pause">
-                    <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
-                    <span className="text-[10px] uppercase tracking-[0.2em] font-medium" style={{ color: "var(--text-muted)" }}>
-                      pause
-                    </span>
-                    <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
-                  </div>
-                );
-              }
-
-              if (block.kind === "broll") {
-                return (
-                  <div
-                    key={i}
-                    className="flex items-start gap-3 rounded-xl px-4 py-3.5"
-                    style={{ background: "var(--bg-muted)", border: "1px solid var(--border)" }}
+            if (block.kind === "broll") {
+              return (
+                <div
+                  key={i}
+                  className="flex items-start gap-3 p-4"
+                  style={{
+                    background: "#131314",
+                    borderLeft: "4px solid #2a2a2b",
+                  }}
+                >
+                  <Film size={16} strokeWidth={1.5} className="mt-0.5 shrink-0" style={{ color: "#a08e7a" }} />
+                  <p
+                    className="italic text-base leading-relaxed"
+                    style={{ color: "#d8c3ad" }}
                   >
-                    <Film size={13} strokeWidth={1.75} className="mt-1 shrink-0" style={{ color: "var(--text-muted)" }} />
-                    <div>
-                      <div className="text-[10px] font-semibold uppercase tracking-[0.12em] mb-1.5" style={{ color: "var(--text-muted)" }}>
-                        B-Roll
-                      </div>
-                      <p className="text-sm italic leading-relaxed" style={{ color: "var(--text-tertiary)" }}>
-                        {block.text || "Visual direction"}
-                      </p>
-                    </div>
-                  </div>
-                );
-              }
+                    {block.text || "Visual direction"}
+                  </p>
+                </div>
+              );
+            }
 
-              if (block.kind === "hook") {
-                return (
-                  <div key={i} className="border-l-2 pl-5" style={{ borderColor: "var(--accent)" }}>
-                    <div
-                      className="text-[10px] font-semibold uppercase tracking-[0.14em] mb-3"
-                      style={{ color: "var(--accent)" }}
+            if (block.kind === "hook") {
+              return (
+                <div key={i} className="flex flex-col gap-3">
+                  <h3
+                    className="text-[0.6875rem] uppercase tracking-widest"
+                    style={{ color: "#a08e7a" }}
+                  >
+                    Opening Hook
+                  </h3>
+                  {splitParagraphs(block.text).map((p, pi, arr) => (
+                    <p
+                      key={pi}
+                      className={clsx(
+                        "text-3xl leading-snug",
+                        isLast && pi === arr.length - 1 && "typing-cursor",
+                      )}
+                      style={{
+                        color: "#ffc174",
+                        fontFamily: '"Newsreader", Georgia, serif',
+                      }}
                     >
-                      Hook
-                    </div>
+                      {p}
+                    </p>
+                  ))}
+                </div>
+              );
+            }
+
+            if (block.kind === "section") {
+              return (
+                <div key={i} className="flex flex-col gap-4">
+                  <h2
+                    className="font-bold text-xl uppercase tracking-wide"
+                    style={{ color: "#e5e2e3" }}
+                  >
+                    {block.title}
+                  </h2>
+                  <div className="flex flex-col gap-3">
                     {splitParagraphs(block.text).map((p, pi, arr) => (
                       <p
                         key={pi}
                         className={clsx(
-                          "font-display text-2xl md:text-3xl font-medium leading-[1.35]",
-                          pi < arr.length - 1 && "mb-3",
+                          "text-base leading-[1.85]",
                           isLast && pi === arr.length - 1 && "typing-cursor",
                         )}
-                        style={{ color: "var(--text-primary)" }}
+                        style={{ color: "#e5e2e3" }}
                       >
                         {p}
                       </p>
                     ))}
                   </div>
-                );
-              }
-
-              if (block.kind === "section") {
-                return (
-                  <div key={i} className="pl-5 border-l-2" style={{ borderColor: "var(--border-strong)" }}>
-                    <div className="text-[10px] font-semibold uppercase tracking-[0.14em] mb-2" style={{ color: "var(--text-muted)" }}>
-                      Section
-                    </div>
-                    <h3 className="font-display text-xl md:text-2xl font-medium leading-tight mb-3" style={{ color: "var(--text-primary)" }}>
-                      {block.title}
-                    </h3>
-                    <div className="space-y-3">
-                      {splitParagraphs(block.text).map((p, pi, arr) => (
-                        <p
-                          key={pi}
-                          className={clsx(
-                            "text-base leading-[1.85]",
-                            isLast && pi === arr.length - 1 && "typing-cursor",
-                          )}
-                          style={{ color: "var(--text-secondary)" }}
-                        >
-                          {p}
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-                );
-              }
-
-              if (block.kind === "conclusion") {
-                return (
-                  <div key={i} className="pl-5 border-l-2" style={{ borderColor: "var(--border-strong)" }}>
-                    <div className="text-[10px] font-semibold uppercase tracking-[0.14em] mb-2" style={{ color: "var(--text-muted)" }}>
-                      Conclusion
-                    </div>
-                    <div className="space-y-3">
-                      {splitParagraphs(block.text).map((p, pi, arr) => (
-                        <p
-                          key={pi}
-                          className={clsx("text-base leading-[1.85]", isLast && pi === arr.length - 1 && "typing-cursor")}
-                          style={{ color: "var(--text-secondary)" }}
-                        >
-                          {p}
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-                );
-              }
-
-              if (block.kind === "cta") {
-                return (
-                  <div
-                    key={i}
-                    className="rounded-xl px-5 py-4"
-                    style={{ background: "var(--accent-light)", border: "1px solid var(--accent-border)" }}
-                  >
-                    <div className="flex items-center gap-2 mb-2.5">
-                      <Megaphone size={13} strokeWidth={1.75} style={{ color: "var(--accent)" }} />
-                      <span className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ color: "var(--accent)" }}>
-                        Call to Action
-                      </span>
-                    </div>
-                    {splitParagraphs(block.text).map((p, pi, arr) => (
-                      <p
-                        key={pi}
-                        className={clsx("text-base leading-[1.8]", pi < arr.length - 1 && "mb-2", isLast && pi === arr.length - 1 && "typing-cursor")}
-                        style={{ color: "var(--text-primary)" }}
-                      >
-                        {p}
-                      </p>
-                    ))}
-                  </div>
-                );
-              }
-
-              return (
-                <p
-                  key={i}
-                  className={clsx("text-base leading-[1.85]", isLast && "typing-cursor")}
-                  style={{ color: "var(--text-secondary)" }}
-                >
-                  {block.text}
-                </p>
+                </div>
               );
-            })}
-          </article>
+            }
+
+            if (block.kind === "conclusion") {
+              return (
+                <div key={i} className="flex flex-col gap-3">
+                  <h3
+                    className="text-[0.6875rem] uppercase tracking-widest"
+                    style={{ color: "#a08e7a" }}
+                  >
+                    Conclusion
+                  </h3>
+                  {splitParagraphs(block.text).map((p, pi, arr) => (
+                    <p
+                      key={pi}
+                      className={clsx("text-base leading-[1.85]", isLast && pi === arr.length - 1 && "typing-cursor")}
+                      style={{ color: "#e5e2e3" }}
+                    >
+                      {p}
+                    </p>
+                  ))}
+                </div>
+              );
+            }
+
+            if (block.kind === "cta") {
+              return (
+                <div
+                  key={i}
+                  className="flex flex-col items-center text-center gap-4 p-8"
+                  style={{ background: "#2a2a2b" }}
+                >
+                  <div className="flex items-center gap-2">
+                    <Megaphone size={14} strokeWidth={1.5} style={{ color: "#f59e0b" }} />
+                    <span
+                      className="text-[0.6875rem] uppercase tracking-widest"
+                      style={{ color: "#f59e0b" }}
+                    >
+                      Call to Action
+                    </span>
+                  </div>
+                  {splitParagraphs(block.text).map((p, pi, arr) => (
+                    <p
+                      key={pi}
+                      className={clsx(
+                        "text-base leading-[1.8]",
+                        isLast && pi === arr.length - 1 && "typing-cursor",
+                      )}
+                      style={{ color: "#d8c3ad" }}
+                    >
+                      {p}
+                    </p>
+                  ))}
+                </div>
+              );
+            }
+
+            return (
+              <p
+                key={i}
+                className={clsx("text-base leading-[1.85]", isLast && "typing-cursor")}
+                style={{ color: "#e5e2e3" }}
+              >
+                {block.text}
+              </p>
+            );
+          })}
         </div>
 
-        {/* Action bar */}
+        {/* Footer: word count + actions */}
         {script && (
-          <div
-            className="flex flex-wrap items-center gap-2 px-5 sm:px-7 py-3.5 border-t"
-            style={{ borderColor: "var(--border)" }}
+          <footer
+            className="flex flex-wrap items-center gap-3 pt-6"
+            style={{ borderTop: "1px solid rgba(83,68,52,0.15)" }}
           >
+            <span
+              className="text-[0.6875rem] uppercase tracking-widest mr-auto"
+              style={{ color: "#534434" }}
+            >
+              {wordCount} {wordCount === 1 ? "word" : "words"}
+            </span>
+
             <button
               type="button"
               onClick={handleCopy}
               disabled={isGenerating}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-medium border cursor-pointer transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-80"
-              style={{ background: "var(--bg-surface)", borderColor: "var(--border)", color: "var(--text-primary)" }}
+              className="flex items-center gap-2 px-4 py-2 text-xs font-medium uppercase tracking-[0.08em] transition-all duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+              style={{
+                background: "#1c1b1c",
+                color: copied ? "#34d399" : "#a08e7a",
+                borderRadius: "0.125rem",
+              }}
             >
               {copied ? (
-                <>
-                  <Check size={14} strokeWidth={2} style={{ color: "#16a34a" }} />
-                  <span style={{ color: "#16a34a" }}>Copied!</span>
-                </>
+                <><Check size={12} strokeWidth={2} /> Copied</>
               ) : (
-                <>
-                  <ClipboardCopy size={14} strokeWidth={1.75} />
-                  Copy script
-                </>
+                <><ClipboardCopy size={12} strokeWidth={1.75} /> Copy Script</>
               )}
             </button>
 
@@ -386,15 +344,19 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
               type="button"
               onClick={onReset}
               disabled={isGenerating}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-medium border cursor-pointer transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-80"
-              style={{ background: "var(--bg-surface)", borderColor: "var(--border)", color: "var(--text-tertiary)" }}
+              className="flex items-center gap-2 px-4 py-2 text-xs font-medium uppercase tracking-[0.08em] transition-all duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+              style={{
+                background: "#1c1b1c",
+                color: "#534434",
+                borderRadius: "0.125rem",
+              }}
             >
-              <RefreshCw size={13} strokeWidth={1.75} />
-              New script
+              <RefreshCw size={12} strokeWidth={1.75} />
+              New Script
             </button>
-          </div>
+          </footer>
         )}
-      </div>
+      </article>
     </motion.section>
   );
 }

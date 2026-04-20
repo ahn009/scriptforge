@@ -1,39 +1,59 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, Menu, X, History, Settings } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 
 interface HeaderProps {
   onReset?: () => void;
+  sidebarOpen: boolean;
+  onToggleSidebar: () => void;
 }
 
-export default function Header({ onReset }: HeaderProps) {
+export default function Header({ onReset, sidebarOpen, onToggleSidebar }: HeaderProps) {
   return (
     <header
-      className="h-16 flex-shrink-0 flex items-center justify-between px-4 sm:px-6 border-b backdrop-blur-md z-50"
+      className="h-14 shrink-0 flex items-center justify-between px-5 md:px-8 z-30 w-full"
       style={{
-        background: "color-mix(in srgb, var(--bg-base) 88%, transparent)",
-        borderColor: "var(--border)",
+        background: "var(--sf-canvas)",
+        boxShadow: "0px 8px 32px rgba(0,0,0,0.3)",
       }}
     >
-      {/* Logo */}
-      <div className="flex items-center gap-2.5">
-        <span
-          className="w-2 h-2 rounded-full flex-shrink-0"
-          style={{ background: "var(--accent)", boxShadow: "0 0 6px var(--accent)" }}
-          aria-hidden
-        />
-        <span
-          className="font-display text-xl font-normal tracking-tight select-none"
-          style={{ color: "var(--text-primary)" }}
-        >
-          ScriptForge
-        </span>
-      </div>
+      {/* Left — hamburger toggle */}
+      <button
+        type="button"
+        onClick={onToggleSidebar}
+        aria-label={sidebarOpen ? "Close navigation" : "Open navigation"}
+        className="flex items-center justify-center w-8 h-8 transition-colors duration-200 cursor-pointer hover:opacity-80"
+        style={{ color: sidebarOpen ? "#ffc174" : "#a08e7a" }}
+      >
+        {sidebarOpen ? (
+          <X size={18} strokeWidth={1.75} />
+        ) : (
+          <Menu size={18} strokeWidth={1.75} />
+        )}
+      </button>
 
       {/* Right controls */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-4">
+        <button
+          type="button"
+          className="transition-colors duration-200 cursor-pointer hover:opacity-80 hidden sm:flex"
+          style={{ color: "#534434" }}
+          aria-label="History"
+        >
+          <History size={16} strokeWidth={1.5} />
+        </button>
+
+        <button
+          type="button"
+          className="transition-colors duration-200 cursor-pointer hover:opacity-80 hidden sm:flex"
+          style={{ color: "#534434" }}
+          aria-label="Settings"
+        >
+          <Settings size={16} strokeWidth={1.5} />
+        </button>
+
         <AnimatePresence>
           {onReset && (
             <motion.button
@@ -44,30 +64,33 @@ export default function Header({ onReset }: HeaderProps) {
               transition={{ duration: 0.2 }}
               type="button"
               onClick={onReset}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium cursor-pointer transition-colors duration-150"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] uppercase tracking-[0.08em] transition-colors cursor-pointer hover:opacity-80"
               style={{
-                color: "var(--text-secondary)",
-                background: "var(--bg-surface)",
-                border: "1px solid var(--border)",
+                color: "#a08e7a",
+                background: "var(--sf-panel)",
+                borderRadius: "0.125rem",
               }}
             >
-              <RotateCcw size={13} strokeWidth={1.75} />
+              <RotateCcw size={11} strokeWidth={1.75} />
               <span className="hidden sm:inline">Reset</span>
             </motion.button>
           )}
         </AnimatePresence>
 
-        <span
-          className="hidden sm:block text-xs font-medium px-2.5 py-1 rounded-full"
+        {/* Theme toggle */}
+        <ThemeToggle />
+
+        {/* Avatar */}
+        <div
+          className="w-8 h-8 flex items-center justify-center text-[11px] font-bold select-none shrink-0"
           style={{
-            color: "var(--text-muted)",
-            background: "var(--bg-surface)",
-            border: "1px solid var(--border)",
+            background: "var(--sf-interactive)",
+            borderRadius: "50%",
+            color: "#f59e0b",
           }}
         >
-          Blue Foxes AI
-        </span>
-        <ThemeToggle />
+          BF
+        </div>
       </div>
     </header>
   );

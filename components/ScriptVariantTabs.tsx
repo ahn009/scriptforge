@@ -10,12 +10,10 @@ interface ScriptVariantTabsProps {
 }
 
 const SCORE_COLOR = (score: number) => {
-  if (score >= 80) return "#22c55e";
-  if (score >= 65) return "var(--accent)";
-  return "var(--text-muted)";
+  if (score >= 80) return "#34d399";
+  if (score >= 65) return "#f59e0b";
+  return "#a08e7a";
 };
-
-const VARIANT_LABELS: Record<VariantId, string> = { A: "A", B: "B", C: "C" };
 
 export default function ScriptVariantTabs({ scripts, activeId, onSelect }: ScriptVariantTabsProps) {
   return (
@@ -34,44 +32,35 @@ export default function ScriptVariantTabs({ scripts, activeId, onSelect }: Scrip
               transition={{ duration: 0.25, delay: i * 0.06 }}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium cursor-pointer transition-all duration-150 focus-visible:outline-none"
-              style={
-                active
-                  ? {
-                      background: "var(--accent-light)",
-                      border: "1px solid var(--accent-border)",
-                      color: "var(--text-primary)",
-                    }
-                  : {
-                      background: "var(--bg-surface)",
-                      border: "1px solid var(--border)",
-                      color: "var(--text-tertiary)",
-                    }
-              }
+              className="flex items-center gap-2 px-4 py-2.5 text-xs font-medium cursor-pointer transition-all duration-150"
+              style={{
+                background: active ? "#1c1b1c" : "#0e0e0f",
+                borderBottom: `2px solid ${active ? "#f59e0b" : "transparent"}`,
+                color: active ? "#e5e2e3" : "#534434",
+              }}
             >
               {/* Variant badge */}
               <span
-                className="w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-bold flex-shrink-0"
+                className="w-5 h-5 flex items-center justify-center text-[10px] font-bold shrink-0"
                 style={{
-                  background: active ? "var(--accent)" : "var(--bg-muted)",
-                  color: active ? "#0a0a0a" : "var(--text-muted)",
+                  background: active ? "#f59e0b" : "#201f20",
+                  color: active ? "#472a00" : "#a08e7a",
+                  borderRadius: "0.125rem",
                 }}
               >
-                {VARIANT_LABELS[s.id]}
+                {s.id}
               </span>
 
-              {/* Score */}
-              <span className="text-xs font-semibold tabular-nums" style={{ color: SCORE_COLOR(s.viral_score) }}>
+              <span className="font-semibold tabular-nums" style={{ color: SCORE_COLOR(s.viral_score) }}>
                 {s.viral_score}
               </span>
 
-              {/* Score bar */}
               <div
-                className="w-12 h-1 rounded-full overflow-hidden hidden sm:block"
-                style={{ background: "var(--bg-muted)" }}
+                className="w-10 h-0.5 overflow-hidden hidden sm:block"
+                style={{ background: "#201f20" }}
               >
                 <motion.div
-                  className="h-full rounded-full"
+                  className="h-full"
                   initial={{ width: 0 }}
                   animate={{ width: `${s.viral_score}%` }}
                   transition={{ duration: 0.6, delay: 0.2 + i * 0.1, ease: "easeOut" }}
@@ -91,7 +80,7 @@ export default function ScriptVariantTabs({ scripts, activeId, onSelect }: Scrip
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.2 }}
-            className="flex flex-wrap items-center gap-3 px-1"
+            className="flex flex-wrap items-center gap-3 px-1 mb-6"
           >
             <MetaPill label="Hook" value={s.hook_type} />
             <MetaPill label="Structure" value={s.structure} />
@@ -106,10 +95,14 @@ export default function ScriptVariantTabs({ scripts, activeId, onSelect }: Scrip
 function MetaPill({ label, value }: { label: string; value: string }) {
   return (
     <span
-      className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs"
-      style={{ background: "var(--bg-surface)", border: "1px solid var(--border)", color: "var(--text-tertiary)" }}
+      className="flex items-center gap-1.5 px-2.5 py-1 text-xs"
+      style={{
+        background: "#1c1b1c",
+        color: "#a08e7a",
+        borderRadius: "0.75rem",
+      }}
     >
-      <span className="font-semibold uppercase tracking-wide text-[9px]" style={{ color: "var(--text-muted)" }}>
+      <span className="font-semibold uppercase tracking-wide text-[9px]" style={{ color: "#534434" }}>
         {label}
       </span>
       {value.replace(/-/g, " ")}
@@ -137,7 +130,7 @@ function ScoreBreakdown({ breakdown, total }: { breakdown: ScriptVariation["scor
             className="w-1.5 rounded-full"
             style={{
               height: `${Math.round((item.value / item.max) * 20) + 4}px`,
-              background: `color-mix(in srgb, var(--accent) ${Math.round((item.value / item.max) * 100)}%, var(--bg-muted))`,
+              background: `color-mix(in srgb, #f59e0b ${Math.round((item.value / item.max) * 100)}%, #201f20)`,
               opacity: 0.85,
             }}
           />

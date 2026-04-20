@@ -2,7 +2,6 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Loader2, Sparkles } from "lucide-react";
-import clsx from "clsx";
 
 interface GenerateButtonProps {
   onClick: () => void;
@@ -21,29 +20,26 @@ export default function GenerateButton({ onClick, isGenerating, disabled, ready,
         type="button"
         onClick={onClick}
         disabled={disabled}
-        whileHover={active ? { scale: 1.01, filter: "brightness(1.1)" } : undefined}
-        whileTap={active ? { scale: 0.97 } : undefined}
-        transition={{ duration: 0.12 }}
-        className={clsx(
-          "relative w-full py-4 px-6 rounded-2xl overflow-hidden",
-          "font-semibold text-base tracking-wide",
-          "flex items-center justify-center gap-2.5",
-          "focus-visible:outline-none",
-          disabled && !isGenerating ? "cursor-not-allowed" : "cursor-pointer",
-        )}
+        whileHover={active ? { filter: "brightness(1.08)" } : undefined}
+        whileTap={active ? { scale: 0.98 } : undefined}
+        transition={{ duration: 0.1 }}
+        className="relative w-full py-4 px-6 overflow-hidden font-bold uppercase tracking-[0.1em] text-xs flex items-center justify-center gap-3 transition-shadow duration-200"
         style={
           active
             ? {
-                background: "linear-gradient(135deg, #f59e0b 0%, #d97706 60%, #b45309 100%)",
-                color: "#0a0a0a",
-                border: "none",
-                boxShadow: "0 0 0 1px rgba(245,158,11,0.3), 0 4px 28px rgba(245,158,11,0.35), 0 1px 4px rgba(0,0,0,0.2)",
+                background: "linear-gradient(to bottom, #f59e0b, #ffc174)",
+                color: "#613b00",
+                borderRadius: "0.125rem",
+                boxShadow: isGenerating
+                  ? "0 12px 30px rgba(245,158,11,0.35)"
+                  : "0 8px 20px rgba(245,158,11,0.25)",
+                cursor: isGenerating ? "wait" : "pointer",
               }
             : {
-                background: "var(--bg-surface)",
-                color: "var(--text-muted)",
-                border: "1px solid var(--border)",
-                boxShadow: "none",
+                background: "#1c1b1c",
+                color: "#534434",
+                borderRadius: "0.125rem",
+                cursor: "not-allowed",
               }
         }
       >
@@ -52,7 +48,7 @@ export default function GenerateButton({ onClick, isGenerating, disabled, ready,
           <motion.div
             className="absolute inset-0 pointer-events-none"
             style={{
-              background: "linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.18) 50%, transparent 60%)",
+              background: "linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.15) 50%, transparent 60%)",
             }}
             animate={{ x: ["-100%", "200%"] }}
             transition={{ duration: 1.4, repeat: Infinity, ease: "linear" }}
@@ -69,8 +65,8 @@ export default function GenerateButton({ onClick, isGenerating, disabled, ready,
               transition={{ duration: 0.15 }}
               className="flex items-center gap-2.5 relative z-10"
             >
-              <Loader2 className="animate-spin" size={17} strokeWidth={2} />
-              Generating 3 scripts…
+              <Loader2 className="animate-spin" size={16} strokeWidth={2} />
+              Forging Manuscript…
             </motion.span>
           ) : (
             <motion.span
@@ -81,8 +77,8 @@ export default function GenerateButton({ onClick, isGenerating, disabled, ready,
               transition={{ duration: 0.15 }}
               className="flex items-center gap-2.5"
             >
-              <Sparkles size={16} strokeWidth={1.75} />
-              Generate 3 scripts
+              <Sparkles size={15} strokeWidth={1.75} />
+              Forge Manuscript
             </motion.span>
           )}
         </AnimatePresence>
@@ -95,10 +91,10 @@ export default function GenerateButton({ onClick, isGenerating, disabled, ready,
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="text-center text-xs"
-            style={{ color: "var(--text-muted)" }}
+            className="text-center text-[11px] uppercase tracking-[0.06em]"
+            style={{ color: "#534434" }}
           >
-            ~15 seconds · 3 distinct variations · free to use
+            ~15 seconds · 3 distinct variations
           </motion.p>
         ) : missingField ? (
           <motion.p
@@ -107,8 +103,8 @@ export default function GenerateButton({ onClick, isGenerating, disabled, ready,
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.18 }}
-            className="text-center text-xs font-medium"
-            style={{ color: "var(--accent)" }}
+            className="text-center text-[11px]"
+            style={{ color: "#f59e0b" }}
           >
             {missingField}
           </motion.p>
@@ -118,10 +114,10 @@ export default function GenerateButton({ onClick, isGenerating, disabled, ready,
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="text-center text-xs"
-            style={{ color: "var(--text-muted)" }}
+            className="text-center text-[11px] uppercase tracking-[0.06em]"
+            style={{ color: "#534434" }}
           >
-            ~15 seconds · 3 distinct variations · free to use
+            ~15 seconds · 3 distinct variations
           </motion.p>
         ) : null}
       </AnimatePresence>

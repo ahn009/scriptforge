@@ -1,7 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
-import clsx from "clsx";
 import { LENGTH_OPTIONS } from "@/lib/constants";
 import type { VideoLength } from "@/lib/types";
 
@@ -15,48 +13,37 @@ export default function LengthSelector({ value, onChange, disabled = false }: Le
   return (
     <div className="w-full">
       <label
-        className="block text-[10px] font-semibold uppercase tracking-[0.14em] mb-3"
-        style={{ color: "var(--text-muted)" }}
+        className="block text-[0.6875rem] font-medium uppercase tracking-widest mb-3"
+        style={{ color: "#e5e2e3" }}
       >
-        Video length
+        Target Duration
       </label>
 
-      <div className="flex flex-wrap gap-2">
+      <div
+        className="flex p-1 w-full"
+        style={{ background: "#201f20", borderRadius: "0.125rem" }}
+      >
         {LENGTH_OPTIONS.map((option) => {
           const selected = value === option.id;
           return (
-            <motion.button
+            <button
               key={option.id}
               type="button"
               disabled={disabled}
               onClick={() => onChange(option.id)}
-              whileHover={disabled ? undefined : { scale: 1.04, y: -1 }}
-              whileTap={disabled ? undefined : { scale: 0.96 }}
-              transition={{ duration: 0.12, ease: "easeOut" }}
-              className={clsx(
-                "px-4 py-2 rounded-full text-sm font-medium cursor-pointer",
-                "focus-visible:outline-none border",
-                disabled && "opacity-50 cursor-not-allowed",
-              )}
-              style={
-                selected
-                  ? {
-                      background: "var(--accent)",
-                      color: "#0a0a0a",
-                      borderColor: "var(--accent)",
-                      boxShadow: "0 0 14px rgba(245,158,11,0.30)",
-                    }
-                  : {
-                      background: "transparent",
-                      color: "var(--text-tertiary)",
-                      borderColor: "var(--border)",
-                      transition: "background 0.12s, color 0.12s, border-color 0.12s",
-                    }
-              }
+              className="flex-1 py-2 text-xs font-medium transition-all duration-150"
+              style={{
+                background: selected ? "#353436" : "transparent",
+                color: selected ? "#ffc174" : "#a08e7a",
+                borderRadius: "0.125rem",
+                boxShadow: selected ? "0 1px 3px rgba(0,0,0,0.3)" : "none",
+                opacity: disabled ? 0.5 : 1,
+                cursor: disabled ? "not-allowed" : "pointer",
+              }}
               aria-pressed={selected}
             >
               {option.label}
-            </motion.button>
+            </button>
           );
         })}
       </div>

@@ -15,22 +15,17 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "ScriptForge AI — Video Script Generator",
-    description:
-      "AI-powered video script generator with a cinematic editorial feel.",
+    description: "AI-powered video script generator with a cinematic editorial feel.",
   },
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className="h-full antialiased" suppressHydrationWarning>
-      <body className="min-h-full">
-        <Providers>
-          <main className="relative z-10">{children}</main>
-        </Providers>
+    <html lang="en" className="dark h-full antialiased" suppressHydrationWarning>
+      <body className="h-screen w-screen overflow-hidden">
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import clsx from "clsx";
 
 const EXAMPLES = [
   "What if I told you the Roman Empire never actually fell…",
@@ -41,19 +40,15 @@ export default function PromptInput({
 
   const count = value.length;
   const nearLimit = count > 400;
-  const isEmpty = count === 0;
 
   return (
     <div className="w-full">
       <label
         htmlFor="prompt"
-        className="block text-[10px] font-semibold uppercase tracking-[0.14em] mb-3"
-        style={{ color: "var(--text-muted)" }}
+        className="block text-[0.6875rem] font-medium uppercase tracking-widest mb-3"
+        style={{ color: "#e5e2e3" }}
       >
-        Your content idea
-        <span className="ml-1.5 text-[9px] font-medium" style={{ color: "var(--accent)", opacity: 0.8 }}>
-          required
-        </span>
+        Prompt Idea
       </label>
 
       <div className="relative">
@@ -63,45 +58,38 @@ export default function PromptInput({
           value={value}
           disabled={disabled}
           onChange={(e) => onChange(e.target.value.slice(0, maxLength))}
-          placeholder={`e.g. "${EXAMPLES[exampleIdx]}"`}
-          className={clsx(
-            "w-full min-h-[140px] px-4 py-4 rounded-2xl",
-            "text-base leading-relaxed",
-            "border shadow-sm transition-all duration-200",
-            "focus:outline-none",
-            disabled && "opacity-50 cursor-not-allowed",
-          )}
+          placeholder={`Describe the scene, characters, or core narrative thrust…\ne.g. "${EXAMPLES[exampleIdx]}"`}
+          className="w-full p-4 text-sm resize-none focus:outline-none transition-colors duration-200"
           style={{
-            background: "var(--bg-input)",
-            color: "var(--text-primary)",
-            borderColor: isEmpty ? "var(--border)" : "var(--accent-border)",
-            boxShadow: isEmpty
-              ? "none"
-              : "0 0 0 3px rgba(245,158,11,0.10)",
-          } as React.CSSProperties}
+            background: "#0e0e0f",
+            color: "#e5e2e3",
+            border: "none",
+            borderBottom: `2px solid ${value ? "#f59e0b" : "#534434"}`,
+            opacity: disabled ? 0.5 : 1,
+            cursor: disabled ? "not-allowed" : "text",
+            fontFamily: '"Inter", sans-serif',
+            lineHeight: "1.6",
+            minHeight: "130px",
+          }}
           maxLength={maxLength}
           rows={5}
           onFocus={(e) => {
-            e.currentTarget.style.borderColor = "var(--accent-border)";
-            e.currentTarget.style.boxShadow = "0 0 0 3px rgba(245,158,11,0.12)";
+            e.currentTarget.style.borderBottomColor = "#f59e0b";
+            e.currentTarget.style.background = "#1c1b1c";
           }}
           onBlur={(e) => {
-            e.currentTarget.style.borderColor = value ? "var(--accent-border)" : "var(--border)";
-            e.currentTarget.style.boxShadow = value ? "0 0 0 3px rgba(245,158,11,0.08)" : "none";
+            e.currentTarget.style.borderBottomColor = value ? "#f59e0b" : "#534434";
+            e.currentTarget.style.background = "#0e0e0f";
           }}
         />
 
         <span
-          className="absolute bottom-3.5 right-4 text-xs tabular-nums pointer-events-none"
-          style={{ color: nearLimit ? "var(--accent)" : "var(--text-muted)" }}
+          className="absolute bottom-3 right-3 text-[11px] tabular-nums pointer-events-none"
+          style={{ color: nearLimit ? "#f59e0b" : "#534434" }}
         >
           {count}/{maxLength}
         </span>
       </div>
-
-      <p className="mt-2 text-xs" style={{ color: "var(--text-muted)" }}>
-        {value ? "Tip: mention your target audience for better results" : "Describe the topic, story, or idea for your video"}
-      </p>
     </div>
   );
 }

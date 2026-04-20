@@ -1,7 +1,7 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import { Sun, Moon, Monitor } from "lucide-react";
+import { Sun, Moon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function ThemeToggle() {
@@ -12,28 +12,25 @@ export default function ThemeToggle() {
 
   if (!mounted) return <div className="w-8 h-8" />;
 
-  function cycle() {
-    if (theme === "light") setTheme("dark");
-    else if (theme === "dark") setTheme("system");
-    else setTheme("light");
-  }
-
-  const Icon = theme === "light" ? Sun : theme === "dark" ? Moon : Monitor;
-  const label = theme === "light" ? "Switch to dark" : theme === "dark" ? "Switch to system" : "Switch to light";
+  const isDark = theme === "dark";
 
   return (
     <button
       type="button"
-      onClick={cycle}
-      aria-label={label}
-      className="flex items-center justify-center w-8 h-8 rounded-lg transition-colors duration-150 cursor-pointer"
+      onClick={() => setTheme(isDark ? "light" : "dark")}
+      aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      className="flex items-center justify-center w-8 h-8 transition-colors duration-200 cursor-pointer"
       style={{
-        color: "var(--text-tertiary)",
-        background: "var(--bg-surface)",
-        border: "1px solid var(--border)",
+        color: "#a08e7a",
+        background: "#2a2a2b",
+        borderRadius: "0.125rem",
       }}
     >
-      <Icon size={15} strokeWidth={1.75} />
+      {isDark ? (
+        <Sun size={15} strokeWidth={1.75} />
+      ) : (
+        <Moon size={15} strokeWidth={1.75} />
+      )}
     </button>
   );
 }
