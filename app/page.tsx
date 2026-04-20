@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { AlertCircle, Sparkles } from "lucide-react";
 import Header from "@/components/Header";
@@ -9,69 +9,51 @@ import ToneSelector from "@/components/ToneSelector";
 import LengthSelector from "@/components/LengthSelector";
 import GenerateButton from "@/components/GenerateButton";
 import ScriptViewer from "@/components/ScriptViewer";
-import type { Tone, VideoLength } from "@/lib/types";
+import ScriptVariantTabs from "@/components/ScriptVariantTabs";
+import type { Tone, VideoLength, ScriptVariation, VariantId } from "@/lib/types";
+import { scriptVariationToText } from "@/lib/types";
 
 export default function Home() {
   const [prompt, setPrompt] = useState("");
   const [tone, setTone] = useState<Tone | null>(null);
   const [length, setLength] = useState<VideoLength | null>(null);
-  const [script, setScript] = useState("");
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [scripts, setScripts] = useState<ScriptVariation[]>([]);
+  const [activeId, setActiveId] = useState<VariantId>("A");
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const outputPanelRef = useRef<HTMLDivElement>(null);
-
   const ready = Boolean(prompt.trim() && tone && length);
-  const hasOutput = Boolean(script) || isGenerating;
+  const hasOutput = scripts.length > 0 || isLoading;
+  const activeScript = scripts.find((s) => s.id === activeId) ?? null;
 
   async function handleGenerate() {
-    if (!ready || isGenerating) return;
-    setIsGenerating(true);
-    setScript("");
+    if (!ready || isLoading) return;
+    setIsLoading(true);
+    setScripts([]);
     setError(null);
-    setTimeout(() => {
-      outputPanelRef.current?.scrollTo({ top: 0, behavior: "smooth" });
-    }, 80);
     try {
       const response = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: prompt.trim(), tone, length }),
       });
-      if (!response.ok) {
-        let message = "Generation failed.";
-        try { const body = await response.json(); if (body?.error) message = body.error; } catch { /* ignore */ }
-        throw new Error(message);
-      }
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-      if (!reader) throw new Error("No response stream.");
-      let streamedError: string | null = null;
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        const chunk = decoder.decode(value, { stream: true });
-        const errIdx = chunk.indexOf("[ERROR]");
-        if (errIdx !== -1) {
-          const before = chunk.slice(0, errIdx);
-          if (before) setScript((prev) => prev + before);
-          streamedError = chunk.slice(errIdx + "[ERROR]".length).trim();
-          continue;
-        }
-        setScript((prev) => prev + chunk);
-      }
-      if (streamedError) throw new Error(streamedError);
+      let data: { scripts?: ScriptVariation[]; error?: string };
+      try { data = await response.json(); } catch { throw new Error("Invalid server response."); }
+      if (!response.ok) throw new Error(data.error ?? "Generation failed.");
+      if (!data.scripts?.length) throw new Error("No scripts returned. Please try again.");
+      setScripts(data.scripts);
+      setActiveId("A");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
     } finally {
-      setIsGenerating(false);
+      setIsLoading(false);
     }
   }
 
   function handleReset() {
-    setScript("");
+    setScripts([]);
     setError(null);
-    setIsGenerating(false);
+    setIsLoading(false);
   }
 
   return (
@@ -83,17 +65,11 @@ export default function Home() {
       <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden>
         <div
           className="absolute top-0 left-1/4 w-[600px] h-[400px] rounded-full"
-          style={{
-            background: "radial-gradient(ellipse, rgba(245,158,11,0.05) 0%, transparent 70%)",
-            filter: "blur(80px)",
-          }}
+          style={{ background: "radial-gradient(ellipse, rgba(245,158,11,0.05) 0%, transparent 70%)", filter: "blur(80px)" }}
         />
         <div
           className="absolute bottom-0 right-0 w-96 h-96 rounded-full"
-          style={{
-            background: "radial-gradient(ellipse, rgba(99,102,241,0.07) 0%, transparent 70%)",
-            filter: "blur(80px)",
-          }}
+          style={{ background: "radial-gradient(ellipse, rgba(99,102,241,0.07) 0%, transparent 70%)", filter: "blur(80px)" }}
         />
       </div>
 
@@ -108,43 +84,26 @@ export default function Home() {
           style={{ borderColor: "var(--border)" }}
         >
           <div className="p-6 lg:p-8 pb-16">
-
-            {/* Panel heading */}
             <div className="mb-8">
-              <p
-                className="text-[10px] font-semibold uppercase tracking-[0.14em] mb-1"
-                style={{ color: "var(--text-muted)" }}
-              >
+              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] mb-1" style={{ color: "var(--text-muted)" }}>
                 Workspace
               </p>
-              <h2
-                className="font-display text-2xl font-medium leading-tight"
-                style={{ color: "var(--text-primary)" }}
-              >
+              <h2 className="font-display text-2xl font-medium leading-tight" style={{ color: "var(--text-primary)" }}>
                 Build your script
               </h2>
             </div>
 
-            {/* Sections with dividers */}
             <div className="pb-7">
-              <PromptInput value={prompt} onChange={setPrompt} disabled={isGenerating} />
+              <PromptInput value={prompt} onChange={setPrompt} disabled={isLoading} />
             </div>
-
             <div className="border-t pt-7 pb-7" style={{ borderColor: "var(--border)" }}>
-              <ToneSelector value={tone} onChange={setTone} disabled={isGenerating} />
+              <ToneSelector value={tone} onChange={setTone} disabled={isLoading} />
             </div>
-
             <div className="border-t pt-7 pb-7" style={{ borderColor: "var(--border)" }}>
-              <LengthSelector value={length} onChange={setLength} disabled={isGenerating} />
+              <LengthSelector value={length} onChange={setLength} disabled={isLoading} />
             </div>
-
             <div className="border-t pt-7" style={{ borderColor: "var(--border)" }}>
-              <GenerateButton
-                onClick={handleGenerate}
-                isGenerating={isGenerating}
-                disabled={!ready || isGenerating}
-                ready={ready}
-              />
+              <GenerateButton onClick={handleGenerate} isGenerating={isLoading} disabled={!ready || isLoading} ready={ready} />
             </div>
 
             <AnimatePresence>
@@ -155,10 +114,7 @@ export default function Home() {
                   exit={{ opacity: 0, y: -4 }}
                   transition={{ duration: 0.22 }}
                   className="mt-5 flex items-start gap-3 rounded-xl px-4 py-4"
-                  style={{
-                    background: "rgba(220,38,38,0.07)",
-                    border: "1px solid rgba(220,38,38,0.20)",
-                  }}
+                  style={{ background: "rgba(220,38,38,0.07)", border: "1px solid rgba(220,38,38,0.20)" }}
                   role="alert"
                 >
                   <AlertCircle size={16} strokeWidth={1.75} className="mt-0.5 shrink-0" style={{ color: "#dc2626" }} />
@@ -174,7 +130,6 @@ export default function Home() {
 
         {/* ── RIGHT PANEL: Output ── */}
         <div
-          ref={outputPanelRef}
           className="flex-1 md:overflow-y-auto border-t md:border-t-0"
           style={{
             borderColor: "var(--border)",
@@ -182,14 +137,28 @@ export default function Home() {
           }}
         >
           <div className="max-w-3xl mx-auto p-6 lg:p-10 pb-16">
-            {hasOutput ? (
-              <ScriptViewer
-                script={script}
-                isGenerating={isGenerating}
-                tone={tone}
-                length={length}
-                onReset={handleReset}
-              />
+            {isLoading ? (
+              <GeneratingState />
+            ) : scripts.length > 0 && activeScript ? (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+              >
+                <ScriptVariantTabs
+                  scripts={scripts}
+                  activeId={activeId}
+                  onSelect={setActiveId}
+                />
+                <ScriptViewer
+                  key={activeId}
+                  script={scriptVariationToText(activeScript)}
+                  isGenerating={false}
+                  tone={tone}
+                  length={length}
+                  onReset={handleReset}
+                />
+              </motion.div>
             ) : (
               <EmptyOutputState />
             )}
@@ -197,6 +166,80 @@ export default function Home() {
         </div>
 
       </div>
+    </div>
+  );
+}
+
+function GeneratingState() {
+  return (
+    <div className="space-y-4">
+      {/* Tab shimmer */}
+      <div className="flex gap-2 mb-6">
+        {["A", "B", "C"].map((id, i) => (
+          <motion.div
+            key={id}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25, delay: i * 0.08 }}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl"
+            style={{ background: "var(--bg-surface)", border: "1px solid var(--border)" }}
+          >
+            <span
+              className="w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-bold shimmer"
+              style={{ minWidth: 20 }}
+            />
+            <div className="w-6 h-2 rounded shimmer" />
+            <div className="w-12 h-1 rounded-full shimmer" />
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Script skeleton */}
+      <div
+        className="rounded-2xl overflow-hidden"
+        style={{ background: "var(--bg-surface)", border: "1px solid var(--border)" }}
+      >
+        <div className="px-6 py-3.5 border-b flex items-center gap-2" style={{ borderColor: "var(--border)" }}>
+          <div className="w-16 h-5 rounded-full shimmer" />
+          <div className="w-12 h-5 rounded-full shimmer" />
+          <div className="ml-auto flex items-center gap-1.5">
+            <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "var(--accent)" }} />
+            <div className="w-14 h-3 rounded shimmer" />
+          </div>
+        </div>
+
+        <div className="p-6 sm:p-8 space-y-8">
+          <div>
+            <div className="text-[10px] font-semibold uppercase tracking-[0.14em] mb-3" style={{ color: "var(--accent)", opacity: 0.6 }}>
+              Hook
+            </div>
+            <div className="border-l-2 pl-5 space-y-2.5" style={{ borderColor: "rgba(245,158,11,0.3)" }}>
+              <div className="h-7 w-4/5 rounded-md shimmer" />
+              <div className="h-7 w-3/5 rounded-md shimmer" />
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex-1 h-px shimmer" />
+            <div className="w-10 h-3 rounded shimmer" />
+            <div className="flex-1 h-px shimmer" />
+          </div>
+          <div className="pl-5 border-l-2 space-y-3" style={{ borderColor: "var(--border-strong)" }}>
+            <div className="h-6 w-2/5 rounded-md shimmer" />
+            <div className="h-4 w-full rounded shimmer" />
+            <div className="h-4 w-11/12 rounded shimmer" />
+            <div className="h-4 w-4/5 rounded shimmer" />
+          </div>
+          <div className="pl-5 border-l-2 space-y-3" style={{ borderColor: "var(--border-strong)" }}>
+            <div className="h-6 w-1/3 rounded-md shimmer" />
+            <div className="h-4 w-full rounded shimmer" />
+            <div className="h-4 w-5/6 rounded shimmer" />
+          </div>
+        </div>
+      </div>
+
+      <p className="text-center text-xs mt-3" style={{ color: "var(--text-muted)" }}>
+        Generating 3 distinct scripts — this takes ~15 seconds
+      </p>
     </div>
   );
 }
@@ -214,14 +257,10 @@ function EmptyOutputState() {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.4, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
         className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6"
-        style={{
-          background: "var(--bg-surface)",
-          border: "1px solid var(--border)",
-        }}
+        style={{ background: "var(--bg-surface)", border: "1px solid var(--border)" }}
       >
         <Sparkles size={22} strokeWidth={1.5} style={{ color: "var(--accent)" }} />
       </motion.div>
-
       <motion.h3
         initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
@@ -233,7 +272,6 @@ function EmptyOutputState() {
         <br />
         <span style={{ color: "var(--text-tertiary)" }}>We&apos;ll turn it into a story.</span>
       </motion.h3>
-
       <motion.p
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -241,7 +279,7 @@ function EmptyOutputState() {
         className="text-sm leading-relaxed max-w-xs"
         style={{ color: "var(--text-muted)" }}
       >
-        Fill in your idea, pick a tone and length, then hit Generate.
+        Get 3 distinct script variations, each scored for viral potential. Pick the one that hits.
       </motion.p>
     </motion.div>
   );

@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
-import { buildSystemPrompt, buildUserMessage } from "@/lib/prompts";
+import { buildMultiScriptSystemPrompt, buildMultiScriptUserMessage } from "@/lib/prompts";
 import { TONE_OPTIONS, LENGTH_OPTIONS } from "@/lib/constants";
-import type { Tone, VideoLength } from "@/lib/types";
+import type { Tone, VideoLength, MultiScriptResponse } from "@/lib/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -9,8 +9,8 @@ export const dynamic = "force-dynamic";
 const VALID_TONES = new Set<Tone>(TONE_OPTIONS.map((t) => t.id));
 const VALID_LENGTHS = new Set<VideoLength>(LENGTH_OPTIONS.map((l) => l.id));
 
-const GEMINI_MODEL = "gemini-flash-latest";
-const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:streamGenerateContent?alt=sse`;
+const GEMINI_MODEL = "gemini-2.0-flash";
+const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
 function json(status: number, body: Record<string, unknown>) {
   return new Response(JSON.stringify(body), {
@@ -19,24 +19,17 @@ function json(status: number, body: Record<string, unknown>) {
   });
 }
 
-type GeminiStreamEvent = {
-  candidates?: Array<{
-    content?: {
-      parts?: Array<{ text?: string }>;
-      role?: string;
-    };
-    finishReason?: string;
-    index?: number;
-  }>;
-  error?: {
-    message?: string;
-    status?: string;
-    code?: number;
-  };
-  promptFeedback?: {
-    blockReason?: string;
-  };
-};
+/** Extract JSON from a string that may contain markdown fences or extra text */
+function extractJSON(raw: string): string {
+  const fenced = raw.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (fenced) return fenced[1].trim();
+  const firstBrace = raw.indexOf("{");
+  const lastBrace = raw.lastIndexOf("}");
+  if (firstBrace !== -1 && lastBrace > firstBrace) {
+    return raw.slice(firstBrace, lastBrace + 1);
+  }
+  return raw.trim();
+}
 
 export async function POST(req: NextRequest) {
   let body: unknown;
@@ -52,45 +45,26 @@ export async function POST(req: NextRequest) {
     length?: unknown;
   };
 
-  if (typeof prompt !== "string") {
-    return json(400, { error: "Prompt is required." });
-  }
+  if (typeof prompt !== "string") return json(400, { error: "Prompt is required." });
   const trimmed = prompt.trim();
-  if (trimmed.length < 3) {
-    return json(400, {
-      error: "Prompt is too short. Give us at least 3 characters to work with.",
-    });
-  }
-  if (trimmed.length > 500) {
-    return json(400, { error: "Prompt must be 500 characters or fewer." });
-  }
-
-  if (typeof tone !== "string" || !VALID_TONES.has(tone as Tone)) {
-    return json(400, { error: "Select a valid tone." });
-  }
-  if (typeof length !== "string" || !VALID_LENGTHS.has(length as VideoLength)) {
-    return json(400, { error: "Select a valid length." });
-  }
+  if (trimmed.length < 3) return json(400, { error: "Prompt is too short. Give us at least 3 characters." });
+  if (trimmed.length > 500) return json(400, { error: "Prompt must be 500 characters or fewer." });
+  if (typeof tone !== "string" || !VALID_TONES.has(tone as Tone)) return json(400, { error: "Select a valid tone." });
+  if (typeof length !== "string" || !VALID_LENGTHS.has(length as VideoLength)) return json(400, { error: "Select a valid length." });
 
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    return json(500, {
-      error:
-        "Server is missing GEMINI_API_KEY. Add it to .env.local and restart the dev server.",
-    });
+    return json(500, { error: "Server is missing GEMINI_API_KEY. Add it to .env.local and restart." });
   }
 
-  const systemPrompt = buildSystemPrompt(tone as Tone, length as VideoLength);
-  const userMessage = buildUserMessage(trimmed);
+  const systemPrompt = buildMultiScriptSystemPrompt(tone as Tone, length as VideoLength);
+  const userMessage = buildMultiScriptUserMessage(trimmed);
 
   let upstream: Response;
   try {
-    upstream = await fetch(GEMINI_ENDPOINT, {
+    upstream = await fetch(`${GEMINI_ENDPOINT}?key=${apiKey}`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-goog-api-key": apiKey,
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         systemInstruction: {
           parts: [{ text: systemPrompt }],
@@ -102,15 +76,10 @@ export async function POST(req: NextRequest) {
           },
         ],
         generationConfig: {
-          temperature: 0.9,
+          temperature: 0.92,
           topP: 0.95,
-          maxOutputTokens: 8192,
-          // Disable Gemini 3 Flash's "thinking" tokens — they consume the
-          // output budget and delay the first visible chunk. For script
-          // generation we want fast, direct prose.
-          thinkingConfig: {
-            thinkingBudget: 0,
-          },
+          maxOutputTokens: 16384,
+          responseMimeType: "application/json",
         },
       }),
     });
@@ -119,7 +88,7 @@ export async function POST(req: NextRequest) {
     return json(502, { error: `Failed to reach Gemini: ${msg}` });
   }
 
-  if (!upstream.ok || !upstream.body) {
+  if (!upstream.ok) {
     let detail = `HTTP ${upstream.status}`;
     try {
       const text = await upstream.text();
@@ -129,102 +98,57 @@ export async function POST(req: NextRequest) {
       } catch {
         detail = text.slice(0, 400);
       }
-    } catch {
-      /* ignore */
-    }
-    return json(upstream.status || 500, {
-      error: `Gemini request failed: ${detail}`,
-    });
+    } catch { /* ignore */ }
+    return json(upstream.status || 500, { error: `Gemini request failed: ${detail}` });
   }
 
-  const encoder = new TextEncoder();
-  const decoder = new TextDecoder();
+  let responseData: unknown;
+  try {
+    responseData = await upstream.json();
+  } catch {
+    return json(502, { error: "Gemini returned unparseable response." });
+  }
 
-  const stream = new ReadableStream<Uint8Array>({
-    async start(controller) {
-      const reader = upstream.body!.getReader();
-      let buffer = "";
+  const geminiJson = responseData as {
+    candidates?: Array<{
+      content?: { parts?: Array<{ text?: string }> };
+      finishReason?: string;
+    }>;
+    promptFeedback?: { blockReason?: string };
+    error?: { message?: string };
+  };
 
-      const processLine = (line: string) => {
-        if (!line.startsWith("data:")) return;
+  if (geminiJson.error?.message) {
+    return json(500, { error: geminiJson.error.message });
+  }
 
-        const payload = line.slice(5).trim();
-        if (!payload || payload === "[DONE]") return;
+  if (geminiJson.promptFeedback?.blockReason) {
+    return json(400, { error: `Content blocked: ${geminiJson.promptFeedback.blockReason}` });
+  }
 
-        let parsed: GeminiStreamEvent;
-        try {
-          parsed = JSON.parse(payload);
-        } catch {
-          return;
-        }
+  const rawText = geminiJson.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!rawText) {
+    return json(502, { error: "Gemini returned no content." });
+  }
 
-        if (parsed.error?.message) {
-          controller.enqueue(
-            encoder.encode(`\n\n[ERROR] ${parsed.error.message}`),
-          );
-          return;
-        }
+  let parsed: MultiScriptResponse;
+  try {
+    parsed = JSON.parse(extractJSON(rawText)) as MultiScriptResponse;
+  } catch {
+    return json(502, { error: "Failed to parse generated scripts. Please try again." });
+  }
 
-        if (parsed.promptFeedback?.blockReason) {
-          controller.enqueue(
-            encoder.encode(
-              `\n\n[ERROR] Content blocked: ${parsed.promptFeedback.blockReason}`,
-            ),
-          );
-          return;
-        }
+  if (!Array.isArray(parsed?.scripts) || parsed.scripts.length === 0) {
+    return json(502, { error: "No scripts returned. Please try again." });
+  }
 
-        const parts = parsed.candidates?.[0]?.content?.parts ?? [];
-        for (const part of parts) {
-          if (typeof part.text === "string" && part.text.length > 0) {
-            controller.enqueue(encoder.encode(part.text));
-          }
-        }
-      };
+  // Clamp viral scores and assign IDs defensively
+  const ids = ["A", "B", "C"] as const;
+  const scripts = parsed.scripts.slice(0, 3).map((s, i) => ({
+    ...s,
+    id: ids[i],
+    viral_score: Math.min(100, Math.max(0, s.viral_score ?? 0)),
+  }));
 
-      try {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          buffer += decoder.decode(value, { stream: true });
-
-          // Process only complete lines. Keep the trailing partial line
-          // (if any) in the buffer for the next iteration.
-          const lastNewline = buffer.lastIndexOf("\n");
-          if (lastNewline === -1) continue;
-
-          const completed = buffer.slice(0, lastNewline);
-          buffer = buffer.slice(lastNewline + 1);
-
-          for (const raw of completed.split(/\r?\n/)) {
-            const line = raw.trim();
-            if (line) processLine(line);
-          }
-        }
-
-        // Flush any remaining buffered line.
-        const tail = buffer.trim();
-        if (tail) processLine(tail);
-
-        controller.close();
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : "Stream failed.";
-        try {
-          controller.enqueue(encoder.encode(`\n\n[ERROR] ${msg}`));
-        } catch {
-          /* ignore */
-        }
-        controller.close();
-      }
-    },
-  });
-
-  return new Response(stream, {
-    headers: {
-      "Content-Type": "text/plain; charset=utf-8",
-      "Cache-Control": "no-cache, no-transform",
-      "X-Accel-Buffering": "no",
-    },
-  });
+  return json(200, { scripts });
 }
