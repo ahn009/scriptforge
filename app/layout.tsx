@@ -1,32 +1,23 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Providers } from "./providers";
 
 export const metadata: Metadata = {
-  title: "ScriptForge AI — Video Script Generator",
-  description:
-    "A jaw-droppingly beautiful AI video script generator. Shape a story, pick a tone, hit the length. Built for Blue Foxes AI Content Lab.",
-  openGraph: {
-    title: "ScriptForge AI — Video Script Generator",
-    description:
-      "AI-powered video script generator with a cinematic editorial feel. Dramatic, neutral, or uplifting — in 1 to 10 minute formats.",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "ScriptForge AI — Video Script Generator",
-    description: "AI-powered video script generator with a cinematic editorial feel.",
-  },
+  title: "ScriptForge AI",
+  description: "Craft compelling video scripts with AI — three unique variations, scored for virality.",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark h-full antialiased" suppressHydrationWarning>
-      <body className="h-screen w-screen overflow-hidden">
-        <Providers>{children}</Providers>
-      </body>
+    <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body>{children}</body>
     </html>
   );
 }

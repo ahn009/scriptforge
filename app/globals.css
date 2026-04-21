@@ -1,156 +1,75 @@
-@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Inter:wght@300;400;500;600;700&display=swap');
-
 @import "tailwindcss";
 
-@theme inline {
-  --color-background: #131314;
-  --color-surface: #131314;
-  --color-surface-dim: #131314;
-  --color-surface-bright: #3a393a;
-  --color-surface-container-lowest: #0e0e0f;
-  --color-surface-container-low: #1c1b1c;
-  --color-surface-container: #201f20;
-  --color-surface-container-high: #2a2a2b;
-  --color-surface-container-highest: #353436;
-  --color-surface-variant: #353436;
-  --color-on-background: #e5e2e3;
-  --color-on-surface: #e5e2e3;
-  --color-on-surface-variant: #d8c3ad;
-  --color-primary: #ffc174;
-  --color-primary-container: #f59e0b;
-  --color-on-primary: #472a00;
-  --color-on-primary-container: #613b00;
-  --color-secondary: #b9c8de;
-  --color-secondary-container: #39485a;
-  --color-on-secondary: #233143;
-  --color-on-secondary-container: #a7b6cc;
-  --color-outline: #a08e7a;
-  --color-outline-variant: #534434;
-  --color-error: #ffb4ab;
-  --color-error-container: #93000a;
-  --font-headline: "Newsreader", Georgia, serif;
-  --font-body: "Inter", -apple-system, sans-serif;
-  --font-label: "Inter", -apple-system, sans-serif;
+@theme {
+  /* Surfaces */
+  --color-parchment: #f5f4ed;
+  --color-ivory: #faf9f5;
+  --color-warm-sand: #e8e6dc;
+  --color-near-black: #141413;
+  --color-dark-surface: #30302e;
+
+  /* Brand */
+  --color-terracotta: #c96442;
+  --color-coral: #d97757;
+
+  /* Neutrals */
+  --color-charcoal-warm: #4d4c48;
+  --color-olive-gray: #5e5d59;
+  --color-stone-gray: #87867f;
+  --color-dark-warm: #3d3d3a;
+  --color-warm-silver: #b0aea5;
+
+  /* Borders */
+  --color-border-cream: #f0eee6;
+  --color-border-warm: #e8e6dc;
+  --color-border-dark: #30302e;
+  --color-ring-warm: #d1cfc5;
+
+  /* Semantic */
+  --color-focus-blue: #3898ec;
+  --color-error-crimson: #b53333;
+
+  /* Typography */
+  --font-serif: Georgia, "Times New Roman", serif;
+  --font-sans: Inter, system-ui, Arial, sans-serif;
+  --font-mono: "Courier New", Courier, monospace;
 }
 
-/* ── Dark mode (default) ─────────────────────────────────── */
-:root,
-.dark {
-  --accent: #f59e0b;
-  --accent-light: rgba(245, 158, 11, 0.10);
-  --accent-border: rgba(245, 158, 11, 0.30);
-  --border: rgba(83, 68, 52, 0.25);
-  --border-strong: #2a2a2b;
-  --accent-dramatic: #f87171;
-  --accent-dramatic-dim: rgba(248, 113, 113, 0.08);
-  --accent-neutral: #818cf8;
-  --accent-neutral-dim: rgba(129, 140, 248, 0.08);
-  --accent-uplifting: #34d399;
-  --accent-uplifting-dim: rgba(52, 211, 153, 0.08);
-  --bg-base: #131314;
-  --bg-surface: #1c1b1c;
-  --bg-muted: #201f20;
-  --bg-hover: #2a2a2b;
-  --bg-input: #0e0e0f;
-  --text-primary: #e5e2e3;
-  --text-secondary: #d8c3ad;
-  --text-tertiary: #a08e7a;
-  --text-muted: #534434;
-  /* Surface layer tokens */
-  --sf-nav: #0e0e0f;
-  --sf-panel: #1c1b1c;
-  --sf-canvas: #131314;
-  --sf-article: #0e0e0f;
-  --sf-interactive: #2a2a2b;
-  --sf-raised: #353436;
-  --divider: rgba(83, 68, 52, 0.15);
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    font-family: var(--font-sans);
+    background-color: #f5f4ed;
+    color: #141413;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background-color: #f5f4ed;
+  }
+
+  textarea, input, button, select {
+    font-family: var(--font-sans);
+  }
 }
 
-/* ── Light mode ─────────────────────────────────────────── */
-.light {
-  --accent: #b45309;
-  --accent-light: rgba(180, 83, 9, 0.08);
-  --accent-border: rgba(180, 83, 9, 0.25);
-  --border: rgba(140, 120, 100, 0.20);
-  --border-strong: #c8c0b4;
-  --accent-dramatic: #dc2626;
-  --accent-dramatic-dim: rgba(220, 38, 38, 0.07);
-  --accent-neutral: #4f46e5;
-  --accent-neutral-dim: rgba(79, 70, 229, 0.07);
-  --accent-uplifting: #059669;
-  --accent-uplifting-dim: rgba(5, 150, 105, 0.07);
-  --bg-base: #f7f5f2;
-  --bg-surface: #eeebe6;
-  --bg-muted: #e4e0da;
-  --bg-hover: #d8d4cc;
-  --bg-input: #f0ede8;
-  --text-primary: #1a1916;
-  --text-secondary: #3d3a34;
-  --text-tertiary: #6b6560;
-  --text-muted: #9c958c;
-  --sf-nav: #eae7e1;
-  --sf-panel: #e4e0da;
-  --sf-canvas: #f7f5f2;
-  --sf-article: #eeebe6;
-  --sf-interactive: #d8d4cc;
-  --sf-raised: #ccc8c0;
-  --divider: rgba(140, 120, 100, 0.15);
+.script-scroll::-webkit-scrollbar {
+  width: 6px;
 }
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+.script-scroll::-webkit-scrollbar-track {
+  background: #f0eee6;
+  border-radius: 3px;
 }
-
-html {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  scroll-behavior: smooth;
+.script-scroll::-webkit-scrollbar-thumb {
+  background: #d1cfc5;
+  border-radius: 3px;
 }
-
-body {
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-  background: var(--bg-base);
-  color: var(--text-primary);
+.script-scroll::-webkit-scrollbar-thumb:hover {
+  background: #b0aea5;
 }
-
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--sf-raised, #353436); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: var(--border-strong, #534434); }
-
-::selection { background: rgba(245, 158, 11, 0.15); color: #ffc174; }
-
-*:focus-visible {
-  outline: 2px solid #f59e0b;
-  outline-offset: 2px;
-  border-radius: 2px;
-}
-
-@keyframes shimmer {
-  0%   { background-position: -400px 0; }
-  100% { background-position:  400px 0; }
-}
-.shimmer {
-  background: linear-gradient(90deg, #201f20 25%, #2a2a2b 50%, #201f20 75%);
-  background-size: 400px 100%;
-  animation: shimmer 1.5s infinite;
-}
-
-@keyframes blink {
-  0%, 50%   { opacity: 1; }
-  51%, 100% { opacity: 0; }
-}
-.typing-cursor::after {
-  content: '';
-  display: inline-block;
-  width: 2px;
-  height: 1em;
-  background: #f59e0b;
-  animation: blink 1s step-end infinite;
-  margin-left: 2px;
-  vertical-align: text-bottom;
-}
-
-textarea { resize: vertical; font-family: "Inter", sans-serif; }
