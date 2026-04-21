@@ -13,6 +13,7 @@ interface ScriptViewerProps {
   tone: Tone | null;
   length: VideoLength | null;
   onReset: () => void;
+  title?: string;
 }
 
 type Block =
@@ -94,7 +95,7 @@ function splitParagraphs(text: string): string[] {
   return text.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
 }
 
-export default function ScriptViewer({ script, isGenerating, tone, length, onReset }: ScriptViewerProps) {
+export default function ScriptViewer({ script, isGenerating, tone, length, onReset, title }: ScriptViewerProps) {
   const [copied, setCopied] = useState(false);
   const blocks = useMemo(() => parseScript(script), [script]);
   const wordCount = useMemo(() => countWords(script), [script]);
@@ -125,27 +126,39 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
     >
       {/* Focus Reader Article */}
       <article
-        className="w-full flex flex-col gap-10 p-8 md:p-12"
+        className="w-full flex flex-col gap-10 p-10 md:p-16"
         style={{
-          background: "#0e0e0f",
+          background: "var(--sf-article)",
+          borderRadius: "0.125rem",
           boxShadow: "0px 20px 40px rgba(0,0,0,0.4)",
         }}
       >
         {/* Article header */}
         <header
           className="flex flex-col gap-3 text-center pb-8"
-          style={{ borderBottom: "1px solid rgba(83,68,52,0.15)" }}
+          style={{ borderBottom: "1px solid var(--divider)" }}
         >
           <span
             className="text-[0.6875rem] uppercase tracking-widest"
-            style={{ color: "#f59e0b" }}
+            style={{ color: "var(--accent)" }}
           >
-            Generated Draft · v1.0
+            Generated Draft v1.0
           </span>
+          {title && title.trim() && (
+            <h1
+              className="text-4xl md:text-5xl leading-[1.2]"
+              style={{
+                fontFamily: '"Newsreader", Georgia, serif',
+                color: "var(--text-primary)",
+              }}
+            >
+              {title}
+            </h1>
+          )}
           {(toneInfo || lengthInfo) && (
             <p
               className="italic text-sm"
-              style={{ color: "#d8c3ad", fontFamily: '"Inter", sans-serif' }}
+              style={{ color: "var(--text-secondary)", fontFamily: '"Inter", sans-serif' }}
             >
               {[lengthInfo && `Target: ${lengthInfo.label}`, toneInfo && `Tone: ${toneInfo.label}`]
                 .filter(Boolean)
@@ -173,14 +186,15 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
                   key={i}
                   className="flex items-start gap-3 p-4"
                   style={{
-                    background: "#131314",
-                    borderLeft: "4px solid #2a2a2b",
+                    background: "var(--bg-base)",
+                    borderLeft: `4px solid var(--sf-interactive)`,
+                    borderRadius: "0.125rem",
                   }}
                 >
-                  <Film size={16} strokeWidth={1.5} className="mt-0.5 shrink-0" style={{ color: "#a08e7a" }} />
+                  <Film size={16} strokeWidth={1.5} className="mt-0.5 shrink-0" style={{ color: "var(--text-tertiary)" }} />
                   <p
                     className="italic text-base leading-relaxed"
-                    style={{ color: "#d8c3ad" }}
+                    style={{ color: "var(--text-secondary)" }}
                   >
                     {block.text || "Visual direction"}
                   </p>
@@ -193,7 +207,7 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
                 <div key={i} className="flex flex-col gap-3">
                   <h3
                     className="text-[0.6875rem] uppercase tracking-widest"
-                    style={{ color: "#a08e7a" }}
+                    style={{ color: "var(--text-tertiary)" }}
                   >
                     Opening Hook
                   </h3>
@@ -205,7 +219,7 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
                         isLast && pi === arr.length - 1 && "typing-cursor",
                       )}
                       style={{
-                        color: "#ffc174",
+                        color: "var(--color-primary)",
                         fontFamily: '"Newsreader", Georgia, serif',
                       }}
                     >
@@ -221,7 +235,7 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
                 <div key={i} className="flex flex-col gap-4">
                   <h2
                     className="font-bold text-xl uppercase tracking-wide"
-                    style={{ color: "#e5e2e3" }}
+                    style={{ color: "var(--text-primary)" }}
                   >
                     {block.title}
                   </h2>
@@ -233,7 +247,7 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
                           "text-base leading-[1.85]",
                           isLast && pi === arr.length - 1 && "typing-cursor",
                         )}
-                        style={{ color: "#e5e2e3" }}
+                        style={{ color: "var(--text-primary)" }}
                       >
                         {p}
                       </p>
@@ -248,7 +262,7 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
                 <div key={i} className="flex flex-col gap-3">
                   <h3
                     className="text-[0.6875rem] uppercase tracking-widest"
-                    style={{ color: "#a08e7a" }}
+                    style={{ color: "var(--text-tertiary)" }}
                   >
                     Conclusion
                   </h3>
@@ -256,7 +270,7 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
                     <p
                       key={pi}
                       className={clsx("text-base leading-[1.85]", isLast && pi === arr.length - 1 && "typing-cursor")}
-                      style={{ color: "#e5e2e3" }}
+                      style={{ color: "var(--text-primary)" }}
                     >
                       {p}
                     </p>
@@ -270,13 +284,18 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
                 <div
                   key={i}
                   className="flex flex-col items-center text-center gap-4 p-8"
-                  style={{ background: "#2a2a2b" }}
+                  style={{
+                    background: "var(--sf-interactive)",
+                    border: "1px solid var(--sf-raised)",
+                    borderRadius: "0.125rem",
+                    boxShadow: "0px 10px 30px rgba(0,0,0,0.2)",
+                  }}
                 >
                   <div className="flex items-center gap-2">
-                    <Megaphone size={14} strokeWidth={1.5} style={{ color: "#f59e0b" }} />
+                    <Megaphone size={14} strokeWidth={1.5} style={{ color: "var(--accent)" }} />
                     <span
                       className="text-[0.6875rem] uppercase tracking-widest"
-                      style={{ color: "#f59e0b" }}
+                      style={{ color: "var(--accent)" }}
                     >
                       Call to Action
                     </span>
@@ -288,7 +307,7 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
                         "text-base leading-[1.8]",
                         isLast && pi === arr.length - 1 && "typing-cursor",
                       )}
-                      style={{ color: "#d8c3ad" }}
+                      style={{ color: "var(--text-secondary)" }}
                     >
                       {p}
                     </p>
@@ -301,7 +320,7 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
               <p
                 key={i}
                 className={clsx("text-base leading-[1.85]", isLast && "typing-cursor")}
-                style={{ color: "#e5e2e3" }}
+                style={{ color: "var(--text-primary)" }}
               >
                 {block.text}
               </p>
@@ -313,11 +332,11 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
         {script && (
           <footer
             className="flex flex-wrap items-center gap-3 pt-6"
-            style={{ borderTop: "1px solid rgba(83,68,52,0.15)" }}
+            style={{ borderTop: "1px solid var(--divider)" }}
           >
             <span
               className="text-[0.6875rem] uppercase tracking-widest mr-auto"
-              style={{ color: "#534434" }}
+              style={{ color: "var(--text-muted)" }}
             >
               {wordCount} {wordCount === 1 ? "word" : "words"}
             </span>
@@ -328,8 +347,8 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
               disabled={isGenerating}
               className="flex items-center gap-2 px-4 py-2 text-xs font-medium uppercase tracking-[0.08em] transition-all duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
               style={{
-                background: "#1c1b1c",
-                color: copied ? "#34d399" : "#a08e7a",
+                background: "var(--sf-panel)",
+                color: copied ? "var(--accent-uplifting)" : "var(--text-tertiary)",
                 borderRadius: "0.125rem",
               }}
             >
@@ -346,8 +365,8 @@ export default function ScriptViewer({ script, isGenerating, tone, length, onRes
               disabled={isGenerating}
               className="flex items-center gap-2 px-4 py-2 text-xs font-medium uppercase tracking-[0.08em] transition-all duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
               style={{
-                background: "#1c1b1c",
-                color: "#534434",
+                background: "var(--sf-panel)",
+                color: "var(--text-muted)",
                 borderRadius: "0.125rem",
               }}
             >

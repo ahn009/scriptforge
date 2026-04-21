@@ -46,7 +46,7 @@ export default function PromptInput({
       <label
         htmlFor="prompt"
         className="block text-[0.6875rem] font-medium uppercase tracking-widest mb-3"
-        style={{ color: "#e5e2e3" }}
+        style={{ color: "var(--text-primary)" }}
       >
         Prompt Idea
       </label>
@@ -61,10 +61,10 @@ export default function PromptInput({
           placeholder={`Describe the scene, characters, or core narrative thrust…\ne.g. "${EXAMPLES[exampleIdx]}"`}
           className="w-full p-4 text-sm resize-none focus:outline-none transition-colors duration-200"
           style={{
-            background: "#0e0e0f",
-            color: "#e5e2e3",
+            background: "var(--bg-input)",
+            color: "var(--text-primary)",
             border: "none",
-            borderBottom: `2px solid ${value ? "#f59e0b" : "#534434"}`,
+            borderBottom: `2px solid ${value ? "var(--accent)" : "var(--text-muted)"}`,
             opacity: disabled ? 0.5 : 1,
             cursor: disabled ? "not-allowed" : "text",
             fontFamily: '"Inter", sans-serif',
@@ -74,18 +74,18 @@ export default function PromptInput({
           maxLength={maxLength}
           rows={5}
           onFocus={(e) => {
-            e.currentTarget.style.borderBottomColor = "#f59e0b";
-            e.currentTarget.style.background = "#1c1b1c";
+            e.currentTarget.style.borderBottomColor = "var(--accent)";
+            e.currentTarget.style.background = "var(--sf-panel)";
           }}
           onBlur={(e) => {
-            e.currentTarget.style.borderBottomColor = value ? "#f59e0b" : "#534434";
-            e.currentTarget.style.background = "#0e0e0f";
+            e.currentTarget.style.borderBottomColor = value ? "var(--accent)" : "var(--text-muted)";
+            e.currentTarget.style.background = "var(--bg-input)";
           }}
         />
 
         <span
           className="absolute bottom-3 right-3 text-[11px] tabular-nums pointer-events-none"
-          style={{ color: nearLimit ? "#f59e0b" : "#534434" }}
+          style={{ color: nearLimit ? "var(--accent)" : "var(--text-muted)" }}
         >
           {count}/{maxLength}
         </span>

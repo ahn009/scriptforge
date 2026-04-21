@@ -27,8 +27,8 @@ export default function GenerateButton({ onClick, isGenerating, disabled, ready,
         style={
           active
             ? {
-                background: "linear-gradient(to bottom, #f59e0b, #ffc174)",
-                color: "#613b00",
+                background: "linear-gradient(to bottom, var(--accent), var(--color-primary))",
+                color: "var(--color-on-primary-container)",
                 borderRadius: "0.125rem",
                 boxShadow: isGenerating
                   ? "0 12px 30px rgba(245,158,11,0.35)"
@@ -36,8 +36,8 @@ export default function GenerateButton({ onClick, isGenerating, disabled, ready,
                 cursor: isGenerating ? "wait" : "pointer",
               }
             : {
-                background: "#1c1b1c",
-                color: "#534434",
+                background: "var(--sf-panel)",
+                color: "var(--text-muted)",
                 borderRadius: "0.125rem",
                 cursor: "not-allowed",
               }
@@ -92,7 +92,7 @@ export default function GenerateButton({ onClick, isGenerating, disabled, ready,
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="text-center text-[11px] uppercase tracking-[0.06em]"
-            style={{ color: "#534434" }}
+            style={{ color: "var(--text-muted)" }}
           >
             ~15 seconds · 3 distinct variations
           </motion.p>
@@ -104,7 +104,7 @@ export default function GenerateButton({ onClick, isGenerating, disabled, ready,
             exit={{ opacity: 0 }}
             transition={{ duration: 0.18 }}
             className="text-center text-[11px]"
-            style={{ color: "#f59e0b" }}
+            style={{ color: "var(--accent)" }}
           >
             {missingField}
           </motion.p>
@@ -115,7 +115,7 @@ export default function GenerateButton({ onClick, isGenerating, disabled, ready,
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="text-center text-[11px] uppercase tracking-[0.06em]"
-            style={{ color: "#534434" }}
+            style={{ color: "var(--text-muted)" }}
           >
             ~15 seconds · 3 distinct variations
           </motion.p>

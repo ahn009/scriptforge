@@ -10,9 +10,9 @@ interface ScriptVariantTabsProps {
 }
 
 const SCORE_COLOR = (score: number) => {
-  if (score >= 80) return "#34d399";
-  if (score >= 65) return "#f59e0b";
-  return "#a08e7a";
+  if (score >= 80) return "var(--accent-uplifting)";
+  if (score >= 65) return "var(--accent)";
+  return "var(--text-tertiary)";
 };
 
 export default function ScriptVariantTabs({ scripts, activeId, onSelect }: ScriptVariantTabsProps) {
@@ -34,17 +34,17 @@ export default function ScriptVariantTabs({ scripts, activeId, onSelect }: Scrip
               whileTap={{ scale: 0.97 }}
               className="flex items-center gap-2 px-4 py-2.5 text-xs font-medium cursor-pointer transition-all duration-150"
               style={{
-                background: active ? "#1c1b1c" : "#0e0e0f",
-                borderBottom: `2px solid ${active ? "#f59e0b" : "transparent"}`,
-                color: active ? "#e5e2e3" : "#534434",
+                background: active ? "var(--sf-panel)" : "var(--bg-input)",
+                borderBottom: `2px solid ${active ? "var(--accent)" : "transparent"}`,
+                color: active ? "var(--text-primary)" : "var(--text-muted)",
               }}
             >
               {/* Variant badge */}
               <span
                 className="w-5 h-5 flex items-center justify-center text-[10px] font-bold shrink-0"
                 style={{
-                  background: active ? "#f59e0b" : "#201f20",
-                  color: active ? "#472a00" : "#a08e7a",
+                  background: active ? "var(--accent)" : "var(--bg-muted)",
+                  color: active ? "var(--color-on-primary)" : "var(--text-tertiary)",
                   borderRadius: "0.125rem",
                 }}
               >
@@ -57,7 +57,7 @@ export default function ScriptVariantTabs({ scripts, activeId, onSelect }: Scrip
 
               <div
                 className="w-10 h-0.5 overflow-hidden hidden sm:block"
-                style={{ background: "#201f20" }}
+                style={{ background: "var(--bg-muted)" }}
               >
                 <motion.div
                   className="h-full"
@@ -97,12 +97,12 @@ function MetaPill({ label, value }: { label: string; value: string }) {
     <span
       className="flex items-center gap-1.5 px-2.5 py-1 text-xs"
       style={{
-        background: "#1c1b1c",
-        color: "#a08e7a",
+        background: "var(--sf-panel)",
+        color: "var(--text-tertiary)",
         borderRadius: "0.75rem",
       }}
     >
-      <span className="font-semibold uppercase tracking-wide text-[9px]" style={{ color: "#534434" }}>
+      <span className="font-semibold uppercase tracking-wide text-[9px]" style={{ color: "var(--text-muted)" }}>
         {label}
       </span>
       {value.replace(/-/g, " ")}
@@ -130,7 +130,7 @@ function ScoreBreakdown({ breakdown, total }: { breakdown: ScriptVariation["scor
             className="w-1.5 rounded-full"
             style={{
               height: `${Math.round((item.value / item.max) * 20) + 4}px`,
-              background: `color-mix(in srgb, #f59e0b ${Math.round((item.value / item.max) * 100)}%, #201f20)`,
+              background: `color-mix(in srgb, var(--accent) ${Math.round((item.value / item.max) * 100)}%, var(--bg-muted))`,
               opacity: 0.85,
             }}
           />

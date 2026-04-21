@@ -21,8 +21,8 @@ export default function ThemeToggle() {
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
       className="flex items-center justify-center w-8 h-8 transition-colors duration-200 cursor-pointer"
       style={{
-        color: "#a08e7a",
-        background: "#2a2a2b",
+        color: "var(--text-tertiary)",
+        background: "var(--sf-interactive)",
         borderRadius: "0.125rem",
       }}
     >

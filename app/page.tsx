@@ -42,10 +42,10 @@ function SideNav({ open, onClose }: { open: boolean; onClose: () => void }) {
 
       {/* Nav panel */}
       <nav
-        className="fixed left-0 top-0 h-screen z-40 w-64 flex flex-col transition-transform duration-300 ease-in-out"
+        className="fixed left-0 top-0 h-screen z-40 w-64 flex flex-col transition-transform duration-300 ease-in-out md:translate-x-0"
         style={{
           background: "var(--sf-nav)",
-          transform: open ? "translateX(0)" : "translateX(-100%)",
+          transform: open ? "translateX(0)" : "-100%",
         }}
         aria-label="Main navigation"
       >
@@ -55,7 +55,7 @@ function SideNav({ open, onClose }: { open: boolean; onClose: () => void }) {
             className="text-xl"
             style={{
               fontFamily: '"Newsreader", Georgia, serif',
-              color: "#f59e0b",
+              color: "var(--accent)",
               fontStyle: "italic",
             }}
           >
@@ -73,8 +73,8 @@ function SideNav({ open, onClose }: { open: boolean; onClose: () => void }) {
             href="#"
             className="flex items-center gap-4 py-4 px-8 border-r-2 transition-all font-medium"
             style={{
-              color: "#f59e0b",
-              borderColor: "#f59e0b",
+              color: "var(--accent)",
+              borderColor: "var(--accent)",
               background: "linear-gradient(to right, rgba(245,158,11,0.07), transparent)",
             }}
           >
@@ -152,7 +152,7 @@ function MobileBottomNav() {
   return (
     <nav
       className="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center h-16 z-50"
-      style={{ background: "rgba(19,19,20,0.95)", backdropFilter: "blur(20px)" }}
+      style={{ background: "var(--sf-nav)", backdropFilter: "blur(20px)" }}
     >
       <a href="#" className="flex flex-col items-center gap-1 py-2 px-5" style={{ color: "var(--text-muted)" }}>
         <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor">
@@ -160,7 +160,7 @@ function MobileBottomNav() {
         </svg>
         <span className="text-[10px] uppercase font-bold tracking-tighter">Input</span>
       </a>
-      <a href="#" className="flex flex-col items-center gap-1 py-2 px-5" style={{ color: "#f59e0b" }}>
+       <a href="#" className="flex flex-col items-center gap-1 py-2 px-5" style={{ color: "var(--accent)" }}>
         <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor">
           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z" />
         </svg>
@@ -237,11 +237,8 @@ export default function Home() {
       {/* Sidebar */}
       <SideNav open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      {/* Main content — shifts right when sidebar is open on desktop */}
-      <div
-        className="flex-1 flex flex-col h-screen overflow-hidden transition-all duration-300 ease-in-out"
-        style={{ marginLeft: sidebarOpen ? "16rem" : "0" }}
-      >
+      {/* Main content — permanently offset on desktop */}
+      <div className="flex-1 flex flex-col h-screen overflow-hidden md:ml-64">
         <Header
           onReset={hasOutput ? handleReset : undefined}
           sidebarOpen={sidebarOpen}
@@ -253,10 +250,9 @@ export default function Home() {
 
           {/* ── LEFT PANEL: Directive Parameters ── */}
           <aside
-            className="w-full md:w-[35%] flex flex-col h-full overflow-hidden shrink-0"
+            className="w-full md:w-[35%] flex flex-col h-full overflow-hidden shrink-0 md:shadow-[20px_0_40px_rgba(0,0,0,0.15)]"
             style={{
               background: "var(--sf-panel)",
-              boxShadow: "20px 0 40px rgba(0,0,0,0.15)",
             }}
           >
             {/* Scrollable inputs */}
@@ -284,7 +280,7 @@ export default function Home() {
 
             {/* Generate CTA — pinned to bottom */}
             <div
-              className="shrink-0 px-8 py-6"
+              className="shrink-0 px-8 py-6 pb-20 md:pb-6"
               style={{ borderTop: "1px solid var(--divider)", background: "var(--sf-panel)" }}
             >
               <GenerateButton
@@ -297,32 +293,32 @@ export default function Home() {
 
               <AnimatePresence>
                 {error && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -4 }}
-                    transition={{ duration: 0.22 }}
-                    className="mt-4 flex items-start gap-3 px-4 py-4"
-                    style={{
-                      background: "rgba(220,38,38,0.07)",
-                      border: "1px solid rgba(220,38,38,0.18)",
-                      borderRadius: "0.125rem",
-                    }}
-                    role="alert"
-                  >
-                    <AlertCircle size={15} strokeWidth={1.75} className="mt-0.5 shrink-0" style={{ color: "#f87171" }} />
-                    <div>
-                      <div
-                        className="text-[0.6875rem] font-semibold uppercase tracking-widest mb-1"
-                        style={{ color: "#f87171" }}
-                      >
-                        Error
-                      </div>
-                      <div className="text-sm leading-relaxed" style={{ color: "var(--text-primary)" }}>
-                        {error}
-                      </div>
-                    </div>
-                  </motion.div>
+                   <motion.div
+                     initial={{ opacity: 0, y: 8 }}
+                     animate={{ opacity: 1, y: 0 }}
+                     exit={{ opacity: 0, y: -4 }}
+                     transition={{ duration: 0.22 }}
+                     className="mt-4 flex items-start gap-3 px-4 py-4"
+                     style={{
+                       background: "rgba(220,38,38,0.07)",
+                       border: "1px solid rgba(220,38,38,0.18)",
+                       borderRadius: "0.125rem",
+                     }}
+                     role="alert"
+                   >
+                     <AlertCircle size={15} strokeWidth={1.75} className="mt-0.5 shrink-0" style={{ color: "var(--accent-dramatic)" }} />
+                     <div>
+                       <div
+                         className="text-[0.6875rem] font-semibold uppercase tracking-widest mb-1"
+                         style={{ color: "var(--accent-dramatic)" }}
+                       >
+                         Error
+                       </div>
+                       <div className="text-sm leading-relaxed" style={{ color: "var(--text-primary)" }}>
+                         {error}
+                       </div>
+                     </div>
+                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
@@ -348,14 +344,15 @@ export default function Home() {
                       activeId={activeId}
                       onSelect={setActiveId}
                     />
-                    <ScriptViewer
-                      key={activeId}
-                      script={scriptVariationToText(activeScript)}
-                      isGenerating={false}
-                      tone={tone}
-                      length={length}
-                      onReset={handleReset}
-                    />
+                     <ScriptViewer
+                       key={activeId}
+                       script={scriptVariationToText(activeScript)}
+                       isGenerating={false}
+                       tone={tone}
+                       length={length}
+                       onReset={handleReset}
+                       title={activeScript?.title}
+                     />
                   </motion.div>
                 ) : (
                   <EmptyOutputState />
@@ -437,15 +434,15 @@ function EmptyOutputState() {
       transition={{ duration: 0.5, delay: 0.1 }}
       className="flex flex-col items-center justify-center min-h-[520px] text-center px-8"
     >
-      <motion.div
-        initial={{ scale: 0.85, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.4, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-        className="w-12 h-12 flex items-center justify-center mb-10"
-        style={{ background: "var(--sf-panel)" }}
-      >
-        <Sparkles size={20} strokeWidth={1.5} style={{ color: "#f59e0b" }} />
-      </motion.div>
+        <motion.div
+          initial={{ scale: 0.85, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.4, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          className="w-12 h-12 flex items-center justify-center mb-10"
+          style={{ background: "var(--sf-panel)" }}
+        >
+          <Sparkles size={20} strokeWidth={1.5} style={{ color: "var(--accent)" }} />
+        </motion.div>
 
       <motion.h3
         initial={{ opacity: 0, y: 6 }}

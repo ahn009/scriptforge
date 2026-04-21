@@ -46,6 +46,7 @@ export interface ScriptVariation {
     cta_strength: number;
   };
   sections: ScriptSection[];
+  title?: string;
 }
 
 export interface MultiScriptResponse {

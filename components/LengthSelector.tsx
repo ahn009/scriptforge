@@ -14,14 +14,14 @@ export default function LengthSelector({ value, onChange, disabled = false }: Le
     <div className="w-full">
       <label
         className="block text-[0.6875rem] font-medium uppercase tracking-widest mb-3"
-        style={{ color: "#e5e2e3" }}
+        style={{ color: "var(--text-primary)" }}
       >
         Target Duration
       </label>
 
       <div
         className="flex p-1 w-full"
-        style={{ background: "#201f20", borderRadius: "0.125rem" }}
+        style={{ background: "var(--bg-muted)", borderRadius: "0.125rem" }}
       >
         {LENGTH_OPTIONS.map((option) => {
           const selected = value === option.id;
@@ -31,10 +31,10 @@ export default function LengthSelector({ value, onChange, disabled = false }: Le
               type="button"
               disabled={disabled}
               onClick={() => onChange(option.id)}
-              className="flex-1 py-2 text-xs font-medium transition-all duration-150"
+              className="flex-1 py-2 text-xs font-medium transition-all duration-150 cursor-pointer hover:text-[var(--text-primary)]"
               style={{
-                background: selected ? "#353436" : "transparent",
-                color: selected ? "#ffc174" : "#a08e7a",
+                background: selected ? "var(--sf-raised)" : "transparent",
+                color: selected ? "var(--color-primary)" : "var(--text-tertiary)",
                 borderRadius: "0.125rem",
                 boxShadow: selected ? "0 1px 3px rgba(0,0,0,0.3)" : "none",
                 opacity: disabled ? 0.5 : 1,

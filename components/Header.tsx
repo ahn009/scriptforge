@@ -16,7 +16,7 @@ export default function Header({ onReset, sidebarOpen, onToggleSidebar }: Header
       className="h-14 shrink-0 flex items-center justify-between px-5 md:px-8 z-30 w-full"
       style={{
         background: "var(--sf-canvas)",
-        boxShadow: "0px 8px 32px rgba(0,0,0,0.3)",
+        boxShadow: "0px 8px 32px rgba(0,0,0,0.4)",
       }}
     >
       {/* Left — hamburger toggle */}
@@ -25,7 +25,7 @@ export default function Header({ onReset, sidebarOpen, onToggleSidebar }: Header
         onClick={onToggleSidebar}
         aria-label={sidebarOpen ? "Close navigation" : "Open navigation"}
         className="flex items-center justify-center w-8 h-8 transition-colors duration-200 cursor-pointer hover:opacity-80"
-        style={{ color: sidebarOpen ? "#ffc174" : "#a08e7a" }}
+        style={{ color: sidebarOpen ? "var(--color-primary)" : "var(--text-tertiary)" }}
       >
         {sidebarOpen ? (
           <X size={18} strokeWidth={1.75} />
@@ -39,7 +39,7 @@ export default function Header({ onReset, sidebarOpen, onToggleSidebar }: Header
         <button
           type="button"
           className="transition-colors duration-200 cursor-pointer hover:opacity-80 hidden sm:flex"
-          style={{ color: "#534434" }}
+          style={{ color: "var(--text-muted)" }}
           aria-label="History"
         >
           <History size={16} strokeWidth={1.5} />
@@ -48,7 +48,7 @@ export default function Header({ onReset, sidebarOpen, onToggleSidebar }: Header
         <button
           type="button"
           className="transition-colors duration-200 cursor-pointer hover:opacity-80 hidden sm:flex"
-          style={{ color: "#534434" }}
+          style={{ color: "var(--text-muted)" }}
           aria-label="Settings"
         >
           <Settings size={16} strokeWidth={1.5} />
@@ -66,7 +66,7 @@ export default function Header({ onReset, sidebarOpen, onToggleSidebar }: Header
               onClick={onReset}
               className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] uppercase tracking-[0.08em] transition-colors cursor-pointer hover:opacity-80"
               style={{
-                color: "#a08e7a",
+                color: "var(--text-tertiary)",
                 background: "var(--sf-panel)",
                 borderRadius: "0.125rem",
               }}
@@ -86,7 +86,7 @@ export default function Header({ onReset, sidebarOpen, onToggleSidebar }: Header
           style={{
             background: "var(--sf-interactive)",
             borderRadius: "50%",
-            color: "#f59e0b",
+            color: "var(--accent)",
           }}
         >
           BF
