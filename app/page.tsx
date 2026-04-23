@@ -1,8 +1,48 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Tone, VideoLength, ScriptVariation, VariantId } from "@/lib/types";
 import { TONE_OPTIONS, LENGTH_OPTIONS } from "@/lib/constants";
+
+const TOPIC_EXAMPLES = [
+  "Why sleep matters more than exercise for fat loss…",
+  "The dark history behind Cleopatra's rise to power…",
+  "5 habits that completely changed my life in 30 days…",
+  "Why most people quit the gym by February…",
+  "The science of why we procrastinate everything…",
+  "How one decision changed the course of history…",
+];
+
+function useCyclingPlaceholder() {
+  const [text, setText] = useState("");
+  const [idx, setIdx] = useState(0);
+  const [charIdx, setCharIdx] = useState(0);
+  const [phase, setPhase] = useState<"typing" | "pausing" | "deleting">("typing");
+
+  useEffect(() => {
+    const target = TOPIC_EXAMPLES[idx];
+    let t: ReturnType<typeof setTimeout>;
+    if (phase === "typing") {
+      if (charIdx < target.length) {
+        t = setTimeout(() => { setText(target.slice(0, charIdx + 1)); setCharIdx(c => c + 1); }, 55);
+      } else {
+        t = setTimeout(() => setPhase("pausing"), 1800);
+      }
+    } else if (phase === "pausing") {
+      t = setTimeout(() => setPhase("deleting"), 100);
+    } else {
+      if (charIdx > 0) {
+        t = setTimeout(() => { setText(target.slice(0, charIdx - 1)); setCharIdx(c => c - 1); }, 28);
+      } else {
+        setIdx(i => (i + 1) % TOPIC_EXAMPLES.length);
+        setPhase("typing");
+      }
+    }
+    return () => clearTimeout(t);
+  }, [phase, charIdx, idx]);
+
+  return text;
+}
 
 /* ── Theme ────────────────────────────────────────────────────── */
 
@@ -127,7 +167,39 @@ function SectionPill({ type }: { type: string }) {
 /* ── Script viewer ────────────────────────────────────────────── */
 
 function ScriptViewer({ script, c }: { script: ScriptVariation; c: ThemeColors }) {
+  const [copied, setCopied] = useState(false);
   const bd = script.score_breakdown;
+
+  const scriptText = script.sections
+    .filter((s) => s.type !== "pause" && s.type !== "broll")
+    .map((s) => {
+      if (s.type === "hook") return `[HOOK]\n${s.text ?? ""}`;
+      if (s.type === "section") return `[${s.title ?? "Section"}]\n${s.text ?? ""}`;
+      if (s.type === "conclusion") return `[CONCLUSION]\n${s.text ?? ""}`;
+      if (s.type === "cta") return `[CALL TO ACTION]\n${s.text ?? ""}`;
+      return s.text ?? "";
+    })
+    .filter(Boolean)
+    .join("\n\n");
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(scriptText);
+    } catch {
+      const ta = document.createElement("textarea");
+      ta.value = scriptText;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <div className="flex flex-col gap-6">
       <div
@@ -147,9 +219,32 @@ function ScriptViewer({ script, c }: { script: ScriptVariation; c: ThemeColors }
               <span className="text-lg" style={{ color: c.textMuted }}>/100</span>
             </p>
           </div>
-          <div className="text-right">
-            <p className="text-xs mb-1" style={{ color: c.textMuted }}>{script.hook_type}</p>
-            <p className="text-xs font-medium" style={{ color: c.textSub }}>{script.structure}</p>
+          <div className="flex flex-col items-end gap-2">
+            <button
+              onClick={handleCopy}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 border cursor-pointer"
+              style={{
+                backgroundColor: copied ? "#1a3a28" : c.inputBg,
+                borderColor:     copied ? "#2d6b44" : c.border,
+                color:           copied ? "#6fcf97" : c.textSub,
+              }}
+            >
+              {copied ? (
+                <>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  Copied!
+                </>
+              ) : (
+                <>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  Copy script
+                </>
+              )}
+            </button>
+            <div className="text-right">
+              <p className="text-xs mb-0.5" style={{ color: c.textMuted }}>{script.hook_type}</p>
+              <p className="text-xs font-medium" style={{ color: c.textSub }}>{script.structure}</p>
+            </div>
           </div>
         </div>
         <div className="flex flex-col gap-2">
@@ -161,7 +256,7 @@ function ScriptViewer({ script, c }: { script: ScriptVariation; c: ThemeColors }
         </div>
       </div>
 
-      <div className="flex flex-col gap-4 script-scroll overflow-y-auto max-h-[52vh] pr-1">
+      <div className="flex flex-col gap-4">
         {script.sections.map((section, i) => (
           <div
             key={i}
@@ -247,7 +342,7 @@ function GeneratingState({ c }: { c: ThemeColors }) {
       <div className="relative w-12 h-12">
         <div
           className="absolute inset-0 rounded-full border-2 animate-spin"
-          style={{ borderColor: c.scoreTrack, borderTopColor: "#c96442" }}
+          style={{ borderTopColor: "#c96442", borderRightColor: c.scoreTrack, borderBottomColor: c.scoreTrack, borderLeftColor: c.scoreTrack }}
         />
       </div>
       <div>
@@ -285,7 +380,7 @@ function MoonIcon({ color }: { color: string }) {
 /* ── Main page ───────────────────────────────────────────────── */
 
 export default function Home() {
-  const [theme, setTheme]           = useState<Theme>("light");
+  const [theme, setTheme]           = useState<Theme>("dark");
   const [prompt, setPrompt]         = useState("");
   const [tone, setTone]             = useState<Tone>("dramatic");
   const [length, setLength]         = useState<VideoLength>("3min");
@@ -294,6 +389,7 @@ export default function Home() {
   const [appState, setAppState]     = useState<"idle" | "generating" | "done" | "error">("idle");
   const [error, setError]           = useState<string | null>(null);
 
+  const animatedPlaceholder = useCyclingPlaceholder();
   const c = T[theme];
   const activeScript = scripts.find((s) => s.id === activeVariant) ?? scripts[0];
   const canGenerate = appState !== "generating" && prompt.trim().length >= 3;
@@ -395,7 +491,7 @@ export default function Home() {
               <textarea
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
-                placeholder="e.g. Why sleep is more important than exercise for fat loss…"
+                placeholder={animatedPlaceholder}
                 rows={5}
                 maxLength={500}
                 className="w-full resize-none rounded-xl px-4 py-3 text-sm border transition-all duration-150"
@@ -545,7 +641,7 @@ export default function Home() {
 
               {/* Script content */}
               {activeScript && (
-                <div className="flex-1 overflow-y-auto script-scroll p-6 lg:p-8">
+                <div className="flex-1 overflow-y-auto p-6 lg:p-8">
                   <ScriptViewer script={activeScript} c={c} />
                 </div>
               )}

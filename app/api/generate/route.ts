@@ -10,7 +10,14 @@ export const dynamic = "force-dynamic";
 const VALID_TONES = new Set<Tone>(TONE_OPTIONS.map((t) => t.id));
 const VALID_LENGTHS = new Set<VideoLength>(LENGTH_OPTIONS.map((l) => l.id));
 
-const CLAUDE_MODEL = "claude-sonnet-4-6";
+const CLAUDE_MODEL = "claude-haiku-4-5-20251001";
+
+const MAX_TOKENS_BY_LENGTH: Record<VideoLength, number> = {
+  "1min":  1500,
+  "3min":  3000,
+  "5min":  5000,
+  "10min": 8000,
+};
 
 function json(status: number, body: Record<string, unknown>) {
   return new Response(JSON.stringify(body), {
@@ -52,23 +59,32 @@ export async function POST(req: NextRequest) {
   if (typeof tone !== "string" || !VALID_TONES.has(tone as Tone)) return json(400, { error: "Select a valid tone." });
   if (typeof length !== "string" || !VALID_LENGTHS.has(length as VideoLength)) return json(400, { error: "Select a valid length." });
 
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
-    return json(500, { error: "Server is missing ANTHROPIC_API_KEY. Add it to .env.local and restart." });
+  const candidateToken = process.env.CANDIDATE_TOKEN;
+  if (!candidateToken) {
+    return json(500, { error: "Server is missing CANDIDATE_TOKEN. Add it to .env.local and restart." });
   }
 
   const systemPrompt = buildMultiScriptSystemPrompt(tone as Tone, length as VideoLength);
-  const userMessage = buildMultiScriptUserMessage(trimmed);
+  const userTopic = buildMultiScriptUserMessage(trimmed);
+  // Embed system instructions in user message — proxies often drop the `system` field
+  const combinedMessage = `${systemPrompt}\n\n---\n\n${userTopic}`;
 
-  const client = new Anthropic({ apiKey });
+  const client = new Anthropic({
+    apiKey: "dummy",
+    baseURL: "https://claude-candidate-proxy.vagueae.workers.dev",
+    defaultHeaders: {
+      "x-candidate-token": candidateToken,
+    },
+  });
+
+  const maxTokens = MAX_TOKENS_BY_LENGTH[length as VideoLength];
 
   let rawText: string;
   try {
     const response = await client.messages.create({
       model: CLAUDE_MODEL,
-      max_tokens: 16000,
-      system: systemPrompt,
-      messages: [{ role: "user", content: userMessage }],
+      max_tokens: maxTokens,
+      messages: [{ role: "user", content: combinedMessage }],
     });
 
     const block = response.content[0];
@@ -76,6 +92,7 @@ export async function POST(req: NextRequest) {
       return json(502, { error: "Claude returned no content." });
     }
     rawText = block.text;
+    console.log("[generate] raw response length:", rawText.length, "| first 200:", rawText.slice(0, 200));
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Network error.";
     return json(502, { error: `Failed to reach Claude: ${msg}` });
@@ -85,6 +102,7 @@ export async function POST(req: NextRequest) {
   try {
     parsed = JSON.parse(extractJSON(rawText)) as MultiScriptResponse;
   } catch {
+    console.error("[generate] JSON parse failed. Raw text:", rawText.slice(0, 500));
     return json(502, { error: "Failed to parse generated scripts. Please try again." });
   }
 
