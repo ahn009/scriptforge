@@ -80,31 +80,42 @@ export async function POST(req: NextRequest) {
 
   const maxTokens = MAX_TOKENS_BY_LENGTH[length as VideoLength];
 
-  let rawText: string;
-  try {
+  async function callClaude(message: string): Promise<string> {
     const response = await client.messages.create({
       model: CLAUDE_MODEL,
       max_tokens: maxTokens,
-      messages: [{ role: "user", content: combinedMessage }],
+      messages: [{ role: "user", content: message }],
     });
-
     const block = response.content[0];
-    if (block.type !== "text" || !block.text) {
-      return json(502, { error: "Claude returned no content." });
-    }
-    rawText = block.text;
-    console.log("[generate] raw response length:", rawText.length, "| first 200:", rawText.slice(0, 200));
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : "Network error.";
-    return json(502, { error: `Failed to reach Claude: ${msg}` });
+    if (block.type !== "text" || !block.text) throw new Error("Empty response");
+    return block.text;
   }
 
-  let parsed: MultiScriptResponse;
-  try {
-    parsed = JSON.parse(extractJSON(rawText)) as MultiScriptResponse;
-  } catch {
-    console.error("[generate] JSON parse failed. Raw text:", rawText.slice(0, 500));
-    return json(502, { error: "Failed to parse generated scripts. Please try again." });
+  // Retry up to 2 attempts on parse failure
+  let rawText = "";
+  let parsed: MultiScriptResponse | null = null;
+
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      rawText = await callClaude(attempt === 1 ? combinedMessage : combinedMessage + "\n\nIMPORTANT: Respond with ONLY the JSON object. No explanation, no markdown, no code fences.");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Network error.";
+      return json(502, { error: `Failed to reach Claude: ${msg}` });
+    }
+
+    console.log(`[generate] attempt ${attempt} | length: ${rawText.length} | start: ${rawText.slice(0, 100)}`);
+
+    try {
+      parsed = JSON.parse(extractJSON(rawText)) as MultiScriptResponse;
+      if (Array.isArray(parsed?.scripts) && parsed.scripts.length > 0) break;
+      parsed = null;
+    } catch {
+      console.warn(`[generate] attempt ${attempt} parse failed. Raw: ${rawText.slice(0, 300)}`);
+    }
+  }
+
+  if (!parsed || !Array.isArray(parsed.scripts) || parsed.scripts.length === 0) {
+    return json(502, { error: "Failed to generate scripts. Please try again." });
   }
 
   if (!Array.isArray(parsed?.scripts) || parsed.scripts.length === 0) {
