@@ -6,6 +6,7 @@ import type { Tone, VideoLength, MultiScriptResponse } from "@/lib/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
 const VALID_TONES = new Set<Tone>(TONE_OPTIONS.map((t) => t.id));
 const VALID_LENGTHS = new Set<VideoLength>(LENGTH_OPTIONS.map((l) => l.id));
