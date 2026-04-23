@@ -400,19 +400,30 @@ export default function Home() {
     setAppState("generating");
     setError(null);
     setScripts([]);
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 75000);
+
     try {
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: trimmed, tone, length }),
+        signal: controller.signal,
       });
+      clearTimeout(timeout);
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Generation failed.");
       setScripts(data.scripts);
       setActive("A");
       setAppState("done");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong.");
+      clearTimeout(timeout);
+      if (err instanceof Error && err.name === "AbortError") {
+        setError("Request timed out. Please try again.");
+      } else {
+        setError(err instanceof Error ? err.message : "Something went wrong.");
+      }
       setAppState("error");
     }
   }
