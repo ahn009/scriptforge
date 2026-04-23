@@ -20,23 +20,13 @@ const MAX_TOKENS_BY_LENGTH: Record<VideoLength, number> = {
   "10min": 8000,
 };
 
+const PREFILL = '{"scripts":[';
+
 function json(status: number, body: Record<string, unknown>) {
   return new Response(JSON.stringify(body), {
     status,
     headers: { "Content-Type": "application/json" },
   });
-}
-
-/** Extract JSON from a string that may contain markdown fences or extra text */
-function extractJSON(raw: string): string {
-  const fenced = raw.match(/```(?:json)?\s*([\s\S]*?)```/);
-  if (fenced) return fenced[1].trim();
-  const firstBrace = raw.indexOf("{");
-  const lastBrace = raw.lastIndexOf("}");
-  if (firstBrace !== -1 && lastBrace > firstBrace) {
-    return raw.slice(firstBrace, lastBrace + 1);
-  }
-  return raw.trim();
 }
 
 export async function POST(req: NextRequest) {
@@ -67,7 +57,6 @@ export async function POST(req: NextRequest) {
 
   const systemPrompt = buildMultiScriptSystemPrompt(tone as Tone, length as VideoLength);
   const userTopic = buildMultiScriptUserMessage(trimmed);
-  // Embed system instructions in user message — proxies often drop the `system` field
   const combinedMessage = `${systemPrompt}\n\n---\n\n${userTopic}`;
 
   const client = new Anthropic({
@@ -80,46 +69,46 @@ export async function POST(req: NextRequest) {
 
   const maxTokens = MAX_TOKENS_BY_LENGTH[length as VideoLength];
 
-  async function callClaude(message: string): Promise<string> {
+  // Assistant prefill forces model to begin response with valid JSON — no preamble possible
+  async function callClaude(): Promise<string> {
     const response = await client.messages.create({
       model: CLAUDE_MODEL,
       max_tokens: maxTokens,
-      messages: [{ role: "user", content: message }],
+      messages: [
+        { role: "user",      content: combinedMessage },
+        { role: "assistant", content: PREFILL },
+      ],
     });
     const block = response.content[0];
     if (block.type !== "text" || !block.text) throw new Error("Empty response");
-    return block.text;
+    // Model continues from PREFILL — prepend it to reconstruct full JSON
+    return PREFILL + block.text;
   }
 
-  // Retry up to 2 attempts on parse failure
   let rawText = "";
   let parsed: MultiScriptResponse | null = null;
 
   for (let attempt = 1; attempt <= 2; attempt++) {
     try {
-      rawText = await callClaude(attempt === 1 ? combinedMessage : combinedMessage + "\n\nIMPORTANT: Respond with ONLY the JSON object. No explanation, no markdown, no code fences.");
+      rawText = await callClaude();
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Network error.";
       return json(502, { error: `Failed to reach Claude: ${msg}` });
     }
 
-    console.log(`[generate] attempt ${attempt} | length: ${rawText.length} | start: ${rawText.slice(0, 100)}`);
+    console.log(`[generate] attempt ${attempt} | tokens: ${rawText.length} | start: ${rawText.slice(0, 80)}`);
 
     try {
-      parsed = JSON.parse(extractJSON(rawText)) as MultiScriptResponse;
+      parsed = JSON.parse(rawText) as MultiScriptResponse;
       if (Array.isArray(parsed?.scripts) && parsed.scripts.length > 0) break;
       parsed = null;
     } catch {
-      console.warn(`[generate] attempt ${attempt} parse failed. Raw: ${rawText.slice(0, 300)}`);
+      console.warn(`[generate] attempt ${attempt} parse failed. tail: ${rawText.slice(-200)}`);
     }
   }
 
   if (!parsed || !Array.isArray(parsed.scripts) || parsed.scripts.length === 0) {
     return json(502, { error: "Failed to generate scripts. Please try again." });
-  }
-
-  if (!Array.isArray(parsed?.scripts) || parsed.scripts.length === 0) {
-    return json(502, { error: "No scripts returned. Please try again." });
   }
 
   const ids = ["A", "B", "C"] as const;
