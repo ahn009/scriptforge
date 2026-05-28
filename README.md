@@ -103,7 +103,7 @@ Dark, cinematic, editorial. No cookie-cutter AI aesthetic.
 1. Push this repo to GitHub.
 2. Import into Vercel, pointing the project root at `scriptforge/`.
 3. Add the `OPENROUTER_API_KEY` environment variable in Project Settings.
-   Optionally add `OPENROUTER_MODEL` to override the default model.
+   Optionally add `OPENROUTER_MODEL` to override the default model, `anthropic/claude-sonnet-4`.
 4. Deploy. That's it.
 
 ## Part 2 — How I Think

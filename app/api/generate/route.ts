@@ -11,7 +11,7 @@ const VALID_TONES = new Set<Tone>(TONE_OPTIONS.map((t) => t.id));
 const VALID_LENGTHS = new Set<VideoLength>(LENGTH_OPTIONS.map((l) => l.id));
 
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
-const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL ?? "anthropic/claude-3.5-haiku";
+const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL ?? "anthropic/claude-sonnet-4";
 
 const MAX_TOKENS_BY_LENGTH: Record<VideoLength, number> = {
   "1min": 1500,
