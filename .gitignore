@@ -10,54 +10,55 @@
 !.yarn/releases
 !.yarn/versions
 
-# testing
-/coverage
-
-# next.js
+# next.js / production output
 /.next/
 /out/
-
-# production
 /build
+next-env.d.ts
+*.tsbuildinfo
 
-# misc
-.DS_Store
-*.pem
+# test output and coverage
+/coverage
+/playwright-report/
+/test-results/
 
-# debug
+# env files, keep only the safe template
+.env*
+!.env.example
+
+# deployment / local tool state
+.vercel
+.mcp.json
+
+# logs and debug files
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+*.log
 
-# env files (can opt-in for committing if needed)
-.env*
-!.env.example
+# local OS/editor files
+.DS_Store
+Thumbs.db
+*.pem
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
 
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-
-# test artifacts
-/playwright-report/
-/test-results/
-
-# claude / agent tooling
+# AI agent/tooling state and prompts
 .agents/
 agents/
 .claude-flow/
-.claude
-.mcp.json
-
-#MD files
+.claude/
 CLAUDE.md
 AGENTS.md
 
-#Design files
-/design-images
-/design
-/graphify-out
+# generated design/code-analysis artifacts
+/design-images/
+/design/
+/graphify-out/
 DESIGN.md
+
+# local ad-hoc scripts that may contain secrets
+/test-llm.js

@@ -1,135 +1,133 @@
 # ScriptForge AI
 
-> A production-grade AI video script generator with a cinematic editorial feel. Built for the Blue Foxes AI Content Lab Full Stack Developer take-home.
-
-Paste an idea. Pick a tone. Pick a length. Get a streaming, broadcast-ready script — complete with `[HOOK]`, `[SECTION]`, `[PAUSE]`, `[B-ROLL]`, and `[CTA]` markers that the UI renders into a typographic reading experience.
-
-## Live Demo
-
-Deploy to Vercel (see below) and drop the URL here.
-
-> _Add a screenshot to `/public/screenshot.png` and reference it here once deployed._
+> A production-grade AI video script generator with a cinematic editorial interface. Paste an idea, choose a tone and length, and generate three polished script options with hooks, sections, B-roll notes, pauses, CTAs, and viral score metadata.
 
 ## Tech Stack
 
-- **Framework** — Next.js (App Router) + TypeScript
-- **Styling** — Tailwind CSS v4 (CSS-first `@theme`) + custom "Obsidian Editorial" design tokens
-- **Animation** — Framer Motion (staggered reveals, spring selections, typing cursor)
-- **Icons** — Lucide React
-- **AI** — OpenRouter Chat Completions API, server-side route returns generated script options
-- **Deployment** — Vercel (zero-config)
+- **Framework**: Next.js App Router, React, TypeScript
+- **Styling**: Tailwind CSS v4 with custom editorial design tokens
+- **Animation/UI**: Framer Motion, Lucide React, next-themes
+- **AI Provider**: OpenRouter Chat Completions API
+- **Default Model**: `anthropic/claude-sonnet-4`
+- **Testing**: Vitest unit tests and Playwright e2e tests
+- **Deployment**: Vercel
 
 ## Quick Start
 
 ```bash
 # 1. Install dependencies
-cd scriptforge
 npm install
 
-# 2. Add your OpenRouter API key (from https://openrouter.ai/keys)
+# 2. Create local env file
 cp .env.example .env.local
-# then edit .env.local and set OPENROUTER_API_KEY=...
 
-# 3. Run the dev server
+# 3. Add your OpenRouter key
+# OPENROUTER_API_KEY=sk-or-v1-...
+
+# 4. Run locally
 npm run dev
-
-# 4. Visit
-open http://localhost:3000
 ```
 
-## Scripts
+Open <http://localhost:3000>.
 
-| Command         | What it does                        |
-| --------------- | ----------------------------------- |
-| `npm run dev`   | Start Next.js in development mode   |
-| `npm run build` | Production build                    |
-| `npm start`     | Run the production build            |
-| `npm run lint`  | Lint the codebase                   |
+## Environment Variables
 
-## Architecture
+| Variable | Required | Description |
+| --- | --- | --- |
+| `OPENROUTER_API_KEY` | Yes | Server-side OpenRouter API key. Never expose this in client code. |
+| `OPENROUTER_MODEL` | No | Model used by `/api/generate`. Defaults to `anthropic/claude-sonnet-4`. |
+| `NEXT_PUBLIC_SITE_URL` | No | Sent as OpenRouter `HTTP-Referer`. Defaults locally to `http://localhost:3000`. |
 
+Example:
+
+```env
+OPENROUTER_API_KEY=
+OPENROUTER_MODEL=anthropic/claude-sonnet-4
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
+
+## Available Scripts
+
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Start the Next.js development server |
+| `npm run build` | Create a production build |
+| `npm start` | Start the production server after building |
+| `npm run lint` | Run ESLint |
+| `npm test` | Run Vitest unit tests |
+| `npm run test:e2e` | Run Playwright e2e tests |
+| `npm run test:all` | Run unit and e2e tests |
+| `npm run verify` | Run lint, build, unit tests, and e2e tests |
+
+## Project Structure
+
+```text
 scriptforge/
 ├── app/
-│   ├── api/generate/route.ts   # OpenRouter endpoint wrapper, input validation, JSON extraction
-│   ├── globals.css             # Obsidian Editorial design tokens + keyframes
-│   ├── layout.tsx              # Root layout + metadata / OG tags
-│   └── page.tsx                # Orchestrator — state, streaming consumer, error UI
-├── components/
-│   ├── Header.tsx              # Serif wordmark + ambient glow
-│   ├── PromptInput.tsx         # Textarea with live character counter
-│   ├── ToneSelector.tsx        # 3 glass cards with animated selection glow
-│   ├── LengthSelector.tsx      # 4 amber pills with spring transitions
-│   ├── GenerateButton.tsx      # Gradient CTA with pulse + state-swap animation
-│   └── ScriptViewer.tsx        # Parses [TAGS] into typographic blocks, streams with a typing cursor
+│   ├── api/generate/route.ts  # Server-only OpenRouter endpoint wrapper
+│   ├── globals.css            # Global styles and Tailwind theme tokens
+│   ├── layout.tsx             # Root metadata/layout
+│   ├── page.tsx               # Main script-generation UI
+│   └── providers.tsx          # App-level providers
 ├── lib/
-│   ├── types.ts                # Tone, VideoLength, ToneOption, LengthOption
-│   ├── constants.ts            # TONE_OPTIONS, LENGTH_OPTIONS, WORD_TARGETS
-│   └── prompts.ts              # prompt builders for the OpenRouter chat request
-├── .agents/config.toml         # Ruflo multi-agent workflow (architect → designer → engineer → reviewer)
-├── CLAUDE.md                   # Behavioural rules for Claude Code
-└── .env.local                  # OPENROUTER_API_KEY (never committed, `.env*` is gitignored)
+│   ├── constants.ts           # Tone and length options
+│   ├── prompts.ts             # Prompt builders for multi-script output
+│   └── types.ts               # Shared TypeScript types
+├── public/                    # Static assets
+├── tests/
+│   ├── e2e/                   # Playwright tests
+│   └── unit/                  # Vitest tests
+├── .env.example               # Safe env template
+├── eslint.config.mjs          # ESLint config
+├── playwright.config.ts       # Playwright config
+├── vitest.config.ts           # Vitest config
+└── package.json
 ```
 
-### How generation works
+## How Generation Works
 
-1. The browser `POST`s `{ prompt, tone, length }` to `/api/generate`.
-2. The route validates inputs, builds a tone-aware system prompt + length-aware structure guide (`lib/prompts.ts`), and calls OpenRouter's OpenAI-compatible `/chat/completions` endpoint.
-3. The browser never sees the API key or upstream response format. It only receives normalized JSON containing up to three script options.
+1. The browser sends `{ prompt, tone, length }` to `POST /api/generate`.
+2. The route validates the request body and rejects invalid prompt, tone, or length values.
+3. `lib/prompts.ts` builds a tone-aware system prompt and a topic-specific user message.
+4. The server calls OpenRouter's OpenAI-compatible `/chat/completions` endpoint with `anthropic/claude-sonnet-4` by default.
+5. The model is asked to produce JSON beginning with `{"scripts":[`.
+6. The route extracts and validates the JSON, clamps viral scores, and returns up to three script options.
 
-## Design System — "Obsidian Editorial"
+The API key stays server-side in `.env.local`. The browser never receives the key or raw OpenRouter response.
 
-Dark, cinematic, editorial. No cookie-cutter AI aesthetic.
+## Design System
 
-- **Palette** — deep `#0A0A0B` base, warm amber `#E8A849` accent, three tone accents (dramatic red `#E84855`, neutral blue `#6C8EBF`, uplifting green `#5DB075`).
-- **Typography** — Playfair Display for display + labels, DM Sans for body.
-- **Texture** — SVG fractal noise overlay + two radial gradient orbs for depth.
-- **Glass** — `backdrop-filter: blur(20px)` on cards, hairline borders, amber focus rings.
-- **Motion** — staggered reveals on load, spring selections, the final streaming paragraph carries a blinking amber cursor.
+ScriptForge uses a warm editorial style inspired by premium writing tools:
 
-## Ruflo Agents Configuration
+- Parchment/light and dark workspace themes
+- Serif display typography for editorial tone
+- Warm neutral surfaces and borders
+- Red, blue, and green accents for tone-specific script options
+- Animated prompt placeholder, theme transitions, and script result cards
 
-`.agents/config.toml` defines the four-agent workflow this project was structured around:
+## Repository Hygiene
 
-| Agent       | Role              | Responsibilities                                    |
-| ----------- | ----------------- | --------------------------------------------------- |
-| `architect` | system-architect  | Types, routing, project structure                   |
-| `designer`  | ui-designer       | Design tokens, components, animations               |
-| `engineer`  | backend-engineer  | API route, streaming, prompt engineering            |
-| `reviewer`  | code-reviewer     | Responsive checks, a11y, edge cases, build verify   |
+The repository intentionally tracks only source, tests, public assets, and safe configuration. The following are ignored and should not be pushed:
 
-## Deployment (Vercel)
+- `.env.local` and all real env files
+- `node_modules/`, `.next/`, build output, coverage, and test artifacts
+- Playwright reports and screenshots
+- Local AI-agent/tooling folders such as `.claude/`, `.claude-flow/`, `.agents/`, and `agents/`
+- Generated design/code-analysis artifacts such as `design/`, `design-images/`, `graphify-out/`, and `DESIGN.md`
+- Ad-hoc local scripts such as `test-llm.js`, especially because they can contain secrets
 
-1. Push this repo to GitHub.
-2. Import into Vercel, pointing the project root at `scriptforge/`.
-3. Add the `OPENROUTER_API_KEY` environment variable in Project Settings.
-   Optionally add `OPENROUTER_MODEL` to override the default model, `anthropic/claude-sonnet-4`.
-4. Deploy. That's it.
+If a secret is ever committed or shared publicly, rotate it immediately in OpenRouter.
 
-## Part 2 — How I Think
+## Deployment on Vercel
 
-### Which repetitive tasks would I automate first?
+1. Push the cleaned repository to GitHub.
+2. Import the project in Vercel.
+3. Add `OPENROUTER_API_KEY` in Vercel Project Settings.
+4. Optionally add `OPENROUTER_MODEL=anthropic/claude-sonnet-4`.
+5. Deploy.
 
-The **content-to-multi-format pipeline** is the biggest time sink in any content team. A single video idea goes through: research → script → thumbnail copy → social captions → email newsletter → blog adaptation. Each step is manual, often done by the same person rewriting the same core message for different channels.
+## Notes
 
-The second target is **performance feedback loops** — pulling analytics from YouTube Studio, cross-referencing with the content calendar, and figuring out what's working. That pattern recognition ("our dramatic history videos between 5–8 minutes are outperforming") is exactly what AI handles well.
-
-### What AI tool would I build?
-
-A **Content Multiplier** — paste a finalized video script or transcript, and it generates all derivative content in one click: YouTube description with SEO keywords, three tweet variations, Instagram caption, newsletter paragraph, blog post draft, and thumbnail text options. Each output is editable inline before export.
-
-Under the hood: Claude with per-format system prompts that preserve the original tone and key messages while adapting structure and length for each platform. The tool stores past outputs to build a "style memory" over time.
-
-### Why would this matter?
-
-Content teams are bottlenecked at **distribution**, not creation. The script is the hard creative work; reformatting it for six platforms is high-effort, low-creativity labor that delays publishing and burns out writers. This tool cuts repurposing from hours to minutes, letting the team ship across all platforms the same day a video drops — which directly impacts reach and algorithm favorability.
-
----
-
-Built with care for the Blue Foxes AI Content Lab take-home.
-
-## Security notes
-
-- `OPENROUTER_API_KEY` lives only in `.env.local`, which is matched by `.env*` in `.gitignore` and will never be committed.
-- The key is read server-side in `app/api/generate/route.ts` and attached to the upstream OpenRouter request via the `Authorization: Bearer ...` header. The browser never sees the key, the endpoint URL, or the OpenRouter response format.
-- If a key is ever accidentally pasted into a public channel, rotate it immediately in OpenRouter.
+- `.env.example` is safe to commit and documents required variables.
+- `.env.local` is ignored and should contain your real OpenRouter key.
+- The default model was verified through OpenRouter without starting the dev server.
