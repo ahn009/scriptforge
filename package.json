@@ -16,7 +16,6 @@
     "verify": "npm run lint && npm run build && vitest run && playwright test"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.90.0",
     "clsx": "^2.1.1",
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.8.0",

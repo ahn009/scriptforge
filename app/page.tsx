@@ -34,8 +34,10 @@ function useCyclingPlaceholder() {
       if (charIdx > 0) {
         t = setTimeout(() => { setText(target.slice(0, charIdx - 1)); setCharIdx(c => c - 1); }, 28);
       } else {
-        setIdx(i => (i + 1) % TOPIC_EXAMPLES.length);
-        setPhase("typing");
+        t = setTimeout(() => {
+          setIdx(i => (i + 1) % TOPIC_EXAMPLES.length);
+          setPhase("typing");
+        }, 0);
       }
     }
     return () => clearTimeout(t);
@@ -492,7 +494,7 @@ export default function Home() {
                 Craft your script
               </h1>
               <p className="text-sm" style={{ color: c.textMuted, lineHeight: 1.6 }}>
-                Describe your video topic and we'll generate three unique, viral-optimised scripts.
+                Describe your video topic and we&apos;ll generate three unique, viral-optimised scripts.
               </p>
             </div>
 

@@ -1,5 +1,4 @@
 import { NextRequest } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
 import { buildMultiScriptSystemPrompt, buildMultiScriptUserMessage } from "@/lib/prompts";
 import { TONE_OPTIONS, LENGTH_OPTIONS } from "@/lib/constants";
 import type { Tone, VideoLength, MultiScriptResponse } from "@/lib/types";
@@ -11,16 +10,28 @@ export const maxDuration = 60;
 const VALID_TONES = new Set<Tone>(TONE_OPTIONS.map((t) => t.id));
 const VALID_LENGTHS = new Set<VideoLength>(LENGTH_OPTIONS.map((l) => l.id));
 
-const CLAUDE_MODEL = "claude-haiku-4-5-20251001";
+const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
+const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL ?? "anthropic/claude-3.5-haiku";
 
 const MAX_TOKENS_BY_LENGTH: Record<VideoLength, number> = {
-  "1min":  1500,
-  "3min":  3000,
-  "5min":  5000,
+  "1min": 1500,
+  "3min": 3000,
+  "5min": 5000,
   "10min": 8000,
 };
 
 const PREFILL = '{"scripts":[';
+
+type OpenRouterResponse = {
+  choices?: Array<{
+    message?: {
+      content?: string | null;
+    };
+  }>;
+  error?: {
+    message?: string;
+  };
+};
 
 function json(status: number, body: Record<string, unknown>) {
   return new Response(JSON.stringify(body), {
@@ -56,12 +67,12 @@ function extractScripts(raw: string): MultiScriptResponse | null {
   const direct = tryParse(cleaned);
   if (direct) return direct;
 
-  // 2. Find {"scripts": anywhere — handles preamble before JSON
+  // 2. Find {"scripts": anywhere, handles preamble before JSON
   const idx = cleaned.indexOf('{"scripts"');
   if (idx !== -1) {
     const from = cleaned.slice(idx);
 
-    // 2a. Brace-count to extract exact JSON object — handles trailing text after JSON
+    // 2a. Brace-count to extract exact JSON object, handles trailing text after JSON
     let depth = 0;
     let endIdx = -1;
     for (let i = 0; i < from.length; i++) {
@@ -73,7 +84,7 @@ function extractScripts(raw: string): MultiScriptResponse | null {
       if (exact) return exact;
     }
 
-    // 2b. JSON truncated by max_tokens — try closing suffixes to salvage partial output
+    // 2b. JSON truncated by max_tokens, try closing suffixes to salvage partial output
     for (const close of [']}', '"]}', '"}]}', '"]}]}']) {
       const r = tryParse(from + close);
       if (r) return r;
@@ -104,39 +115,47 @@ export async function POST(req: NextRequest) {
   if (typeof tone !== "string" || !VALID_TONES.has(tone as Tone)) return json(400, { error: "Select a valid tone." });
   if (typeof length !== "string" || !VALID_LENGTHS.has(length as VideoLength)) return json(400, { error: "Select a valid length." });
 
-  const candidateToken = process.env.CANDIDATE_TOKEN;
-  if (!candidateToken) {
-    return json(500, { error: "Server is missing CANDIDATE_TOKEN. Add it to .env.local and restart." });
+  const openRouterApiKey = process.env.OPENROUTER_API_KEY;
+  if (!openRouterApiKey) {
+    return json(500, { error: "Server is missing OPENROUTER_API_KEY. Add it to .env.local and restart." });
   }
 
   const systemPrompt = buildMultiScriptSystemPrompt(tone as Tone, length as VideoLength);
   const userTopic = buildMultiScriptUserMessage(trimmed);
-  const combinedMessage = `${systemPrompt}\n\n---\n\n${userTopic}`;
-
-  const client = new Anthropic({
-    apiKey: "dummy",
-    baseURL: "https://claude-candidate-proxy.vagueae.workers.dev",
-    defaultHeaders: {
-      "x-candidate-token": candidateToken,
-    },
-  });
-
   const maxTokens = MAX_TOKENS_BY_LENGTH[length as VideoLength];
 
-  // Assistant prefill forces model to begin response with valid JSON — no preamble possible
-  async function callClaude(): Promise<string> {
-    const response = await client.messages.create({
-      model: CLAUDE_MODEL,
-      max_tokens: maxTokens,
-      messages: [
-        { role: "user",      content: combinedMessage },
-        { role: "assistant", content: PREFILL },
-      ],
+  async function callOpenRouter(): Promise<string> {
+    const response = await fetch(OPENROUTER_API_URL, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${openRouterApiKey}`,
+        "Content-Type": "application/json",
+        "HTTP-Referer": process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+        "X-Title": "ScriptForge AI",
+      },
+      body: JSON.stringify({
+        model: OPENROUTER_MODEL,
+        max_tokens: maxTokens,
+        temperature: 0.8,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userTopic },
+          { role: "assistant", content: PREFILL },
+        ],
+      }),
     });
-    const block = response.content[0];
-    if (block.type !== "text" || !block.text) throw new Error("Empty response");
-    // Model continues from PREFILL — prepend it to reconstruct full JSON
-    return PREFILL + block.text;
+
+    const data = await response.json().catch(() => null) as OpenRouterResponse | null;
+
+    if (!response.ok) {
+      throw new Error(data?.error?.message ?? `OpenRouter request failed with status ${response.status}`);
+    }
+
+    const content = data?.choices?.[0]?.message?.content;
+    if (!content) throw new Error("Empty response");
+
+    // Model continues from PREFILL, prepend it to reconstruct full JSON.
+    return content.startsWith(PREFILL) ? content : PREFILL + content;
   }
 
   let rawText = "";
@@ -145,7 +164,7 @@ export async function POST(req: NextRequest) {
 
   for (let attempt = 1; attempt <= 3; attempt++) {
     try {
-      rawText = await callClaude();
+      rawText = await callOpenRouter();
     } catch (err) {
       lastNetworkError = err instanceof Error ? err.message : "Network error.";
       console.warn(`[generate] attempt ${attempt} network error: ${lastNetworkError}`);

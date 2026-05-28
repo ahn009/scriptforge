@@ -16,7 +16,7 @@ Deploy to Vercel (see below) and drop the URL here.
 - **Styling** — Tailwind CSS v4 (CSS-first `@theme`) + custom "Obsidian Editorial" design tokens
 - **Animation** — Framer Motion (staggered reveals, spring selections, typing cursor)
 - **Icons** — Lucide React
-- **AI** — Google Gemini (`gemini-flash-latest`) via Google AI Studio's free API, server-side SSE streaming relayed as text chunks
+- **AI** — OpenRouter Chat Completions API, server-side route returns generated script options
 - **Deployment** — Vercel (zero-config)
 
 ## Quick Start
@@ -26,9 +26,9 @@ Deploy to Vercel (see below) and drop the URL here.
 cd scriptforge
 npm install
 
-# 2. Add your Gemini API key (free from https://aistudio.google.com/)
+# 2. Add your OpenRouter API key (from https://openrouter.ai/keys)
 cp .env.example .env.local
-# then edit .env.local and set GEMINI_API_KEY=...
+# then edit .env.local and set OPENROUTER_API_KEY=...
 
 # 3. Run the dev server
 npm run dev
@@ -51,7 +51,7 @@ open http://localhost:3000
 ```
 scriptforge/
 ├── app/
-│   ├── api/generate/route.ts   # Streaming Gemini endpoint (SSE parser, input validation, relayed text chunks)
+│   ├── api/generate/route.ts   # OpenRouter endpoint wrapper, input validation, JSON extraction
 │   ├── globals.css             # Obsidian Editorial design tokens + keyframes
 │   ├── layout.tsx              # Root layout + metadata / OG tags
 │   └── page.tsx                # Orchestrator — state, streaming consumer, error UI
@@ -65,18 +65,17 @@ scriptforge/
 ├── lib/
 │   ├── types.ts                # Tone, VideoLength, ToneOption, LengthOption
 │   ├── constants.ts            # TONE_OPTIONS, LENGTH_OPTIONS, WORD_TARGETS
-│   └── prompts.ts              # buildSystemPrompt() — tone directives + length structure guides (used as Gemini systemInstruction)
+│   └── prompts.ts              # prompt builders for the OpenRouter chat request
 ├── .agents/config.toml         # Ruflo multi-agent workflow (architect → designer → engineer → reviewer)
 ├── CLAUDE.md                   # Behavioural rules for Claude Code
-└── .env.local                  # GEMINI_API_KEY (never committed — `.env*` is gitignored)
+└── .env.local                  # OPENROUTER_API_KEY (never committed, `.env*` is gitignored)
 ```
 
-### How streaming works
+### How generation works
 
 1. The browser `POST`s `{ prompt, tone, length }` to `/api/generate`.
-2. The route validates inputs, builds a tone-aware system prompt + length-aware structure guide (`lib/prompts.ts`), and calls Gemini's `:streamGenerateContent?alt=sse` endpoint with the prompt as `systemInstruction`.
-3. The server parses the upstream SSE events, extracts `candidates[0].content.parts[].text`, and relays raw text chunks through a `ReadableStream` to the client — so the browser never sees the API key or the Gemini wire format.
-4. The client reads the stream via `response.body.getReader()` and appends to state, which re-parses the tagged script into live-rendered blocks with a typing cursor on the final paragraph.
+2. The route validates inputs, builds a tone-aware system prompt + length-aware structure guide (`lib/prompts.ts`), and calls OpenRouter's OpenAI-compatible `/chat/completions` endpoint.
+3. The browser never sees the API key or upstream response format. It only receives normalized JSON containing up to three script options.
 
 ## Design System — "Obsidian Editorial"
 
@@ -103,7 +102,8 @@ Dark, cinematic, editorial. No cookie-cutter AI aesthetic.
 
 1. Push this repo to GitHub.
 2. Import into Vercel, pointing the project root at `scriptforge/`.
-3. Add the `GEMINI_API_KEY` environment variable in Project Settings.
+3. Add the `OPENROUTER_API_KEY` environment variable in Project Settings.
+   Optionally add `OPENROUTER_MODEL` to override the default model.
 4. Deploy. That's it.
 
 ## Part 2 — How I Think
@@ -130,6 +130,6 @@ Built with care for the Blue Foxes AI Content Lab take-home.
 
 ## Security notes
 
-- `GEMINI_API_KEY` lives only in `.env.local`, which is matched by `.env*` in `.gitignore` and will never be committed.
-- The key is read server-side in `app/api/generate/route.ts` and attached to the upstream Gemini request via the `X-goog-api-key` header. The browser never sees the key, the endpoint URL, or the Gemini response format — it only receives plain text chunks.
-- If a key is ever accidentally pasted into a public channel, rotate it immediately in Google AI Studio.
+- `OPENROUTER_API_KEY` lives only in `.env.local`, which is matched by `.env*` in `.gitignore` and will never be committed.
+- The key is read server-side in `app/api/generate/route.ts` and attached to the upstream OpenRouter request via the `Authorization: Bearer ...` header. The browser never sees the key, the endpoint URL, or the OpenRouter response format.
+- If a key is ever accidentally pasted into a public channel, rotate it immediately in OpenRouter.
