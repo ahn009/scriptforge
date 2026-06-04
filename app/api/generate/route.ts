@@ -20,6 +20,8 @@ const MAX_TOKENS_BY_LENGTH: Record<VideoLength, number> = {
   "10min": 8000,
 };
 
+const LOW_BUDGET_TOKEN_BUFFER = 32;
+const MIN_RETRY_MAX_TOKENS = 500;
 const PREFILL = '{"scripts":[';
 
 type OpenRouterResponse = {
@@ -38,6 +40,49 @@ function json(status: number, body: Record<string, unknown>) {
     status,
     headers: { "Content-Type": "application/json" },
   });
+}
+
+export function affordableMaxTokensFromError(message: string): number | null {
+  const match = message.match(/can only afford\s+(\d+)/i);
+  if (!match) return null;
+
+  const affordable = Number.parseInt(match[1], 10);
+  if (!Number.isFinite(affordable) || affordable <= LOW_BUDGET_TOKEN_BUFFER) {
+    return null;
+  }
+
+  return affordable - LOW_BUDGET_TOKEN_BUFFER;
+}
+
+function configuredMaxTokens(length: VideoLength): number {
+  const requested = MAX_TOKENS_BY_LENGTH[length];
+  const configuredCap = Number.parseInt(process.env.OPENROUTER_MAX_TOKENS ?? "", 10);
+
+  if (!Number.isFinite(configuredCap) || configuredCap <= 0) {
+    return requested;
+  }
+
+  return Math.min(requested, configuredCap);
+}
+
+export function addResponseBudgetOverride(
+  systemPrompt: string,
+  responseMaxTokens: number,
+  recommendedMaxTokens: number,
+) {
+  if (responseMaxTokens >= recommendedMaxTokens) return systemPrompt;
+
+  const perScriptWords =
+    responseMaxTokens < 1000 ? 65 :
+    responseMaxTokens < 1600 ? 100 :
+    140;
+
+  return `${systemPrompt}
+
+## RESPONSE BUDGET OVERRIDE
+The available completion budget is ${responseMaxTokens} tokens. Complete valid JSON is more important than exact word targets.
+Return all 3 scripts, but keep each script to ${perScriptWords} words or fewer with 3-4 sections each.
+Avoid optional b-roll sections unless they are essential.`;
 }
 
 function isValidResponse(p: unknown): p is MultiScriptResponse {
@@ -122,9 +167,16 @@ export async function POST(req: NextRequest) {
 
   const systemPrompt = buildMultiScriptSystemPrompt(tone as Tone, length as VideoLength);
   const userTopic = buildMultiScriptUserMessage(trimmed);
-  const maxTokens = MAX_TOKENS_BY_LENGTH[length as VideoLength];
+  const recommendedMaxTokens = MAX_TOKENS_BY_LENGTH[length as VideoLength];
+  let responseMaxTokens = configuredMaxTokens(length as VideoLength);
 
   async function callOpenRouter(): Promise<string> {
+    const promptForAttempt = addResponseBudgetOverride(
+      systemPrompt,
+      responseMaxTokens,
+      recommendedMaxTokens,
+    );
+
     const response = await fetch(OPENROUTER_API_URL, {
       method: "POST",
       headers: {
@@ -135,10 +187,10 @@ export async function POST(req: NextRequest) {
       },
       body: JSON.stringify({
         model: OPENROUTER_MODEL,
-        max_tokens: maxTokens,
+        max_tokens: responseMaxTokens,
         temperature: 0.8,
         messages: [
-          { role: "system", content: systemPrompt },
+          { role: "system", content: promptForAttempt },
           { role: "user", content: userTopic },
           { role: "assistant", content: PREFILL },
         ],
@@ -168,6 +220,19 @@ export async function POST(req: NextRequest) {
     } catch (err) {
       lastNetworkError = err instanceof Error ? err.message : "Network error.";
       console.warn(`[generate] attempt ${attempt} network error: ${lastNetworkError}`);
+
+      const affordableMaxTokens = affordableMaxTokensFromError(lastNetworkError);
+      if (affordableMaxTokens !== null && affordableMaxTokens < responseMaxTokens) {
+        if (affordableMaxTokens < MIN_RETRY_MAX_TOKENS) {
+          return json(402, {
+            error: `OpenRouter balance only allows about ${affordableMaxTokens + LOW_BUDGET_TOKEN_BUFFER} output tokens. Add credits or choose a shorter length.`,
+          });
+        }
+
+        responseMaxTokens = affordableMaxTokens;
+        console.warn(`[generate] retrying with reduced max_tokens: ${responseMaxTokens}`);
+      }
+
       continue; // retry instead of returning immediately
     }
 

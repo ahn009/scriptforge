@@ -36,6 +36,7 @@ Open <http://localhost:3000>.
 | --- | --- | --- |
 | `OPENROUTER_API_KEY` | Yes | Server-side OpenRouter API key. Never expose this in client code. |
 | `OPENROUTER_MODEL` | No | Model used by `/api/generate`. Defaults to `anthropic/claude-sonnet-4`. |
+| `OPENROUTER_MAX_TOKENS` | No | Optional completion-token cap for low-credit OpenRouter accounts. The API also retries with a smaller cap when OpenRouter reports an affordable budget. |
 | `NEXT_PUBLIC_SITE_URL` | No | Sent as OpenRouter `HTTP-Referer`. Defaults locally to `http://localhost:3000`. |
 
 Example:
@@ -43,6 +44,7 @@ Example:
 ```env
 OPENROUTER_API_KEY=
 OPENROUTER_MODEL=anthropic/claude-sonnet-4
+OPENROUTER_MAX_TOKENS=
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
